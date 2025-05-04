@@ -66,23 +66,35 @@ export const ClassFilters = ({ filters, onFilterChange, trainers }: ClassFilters
     }
     
     // For array-type filters, we need proper type checking
-    if (
-      filterName === 'timeOfDay' || 
-      filterName === 'classType' || 
-      filterName === 'trainerId' || 
-      filterName === 'room' || 
-      filterName === 'availability'
-    ) {
-      // Use the correct type for the specific filter
-      type FilterKey = 'timeOfDay' | 'classType' | 'trainerId' | 'room' | 'availability';
-      const key = filterName as FilterKey;
-      const currentValues = filters[key];
-      
-      // Now TypeScript knows these values are arrays
+    if (filterName === 'timeOfDay') {
+      const currentValues = filters.timeOfDay;
       const newValues = currentValues.includes(value)
         ? currentValues.filter(v => v !== value)
         : [...currentValues, value];
-      
+      onFilterChange({ [filterName]: newValues });
+    } else if (filterName === 'classType') {
+      const currentValues = filters.classType;
+      const newValues = currentValues.includes(value as ClassType)
+        ? currentValues.filter(v => v !== value)
+        : [...currentValues, value as ClassType];
+      onFilterChange({ [filterName]: newValues });
+    } else if (filterName === 'trainerId') {
+      const currentValues = filters.trainerId;
+      const newValues = currentValues.includes(value)
+        ? currentValues.filter(v => v !== value)
+        : [...currentValues, value];
+      onFilterChange({ [filterName]: newValues });
+    } else if (filterName === 'room') {
+      const currentValues = filters.room;
+      const newValues = currentValues.includes(value as Room)
+        ? currentValues.filter(v => v !== value)
+        : [...currentValues, value as Room];
+      onFilterChange({ [filterName]: newValues });
+    } else if (filterName === 'availability') {
+      const currentValues = filters.availability;
+      const newValues = currentValues.includes(value)
+        ? currentValues.filter(v => v !== value)
+        : [...currentValues, value];
       onFilterChange({ [filterName]: newValues });
     }
   };
