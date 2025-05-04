@@ -57,7 +57,7 @@ export const ClassFilters = ({ filters, onFilterChange, trainers }: ClassFilters
   };
 
   // Handle toggle arrays (timeOfDay, classType, etc)
-  const handleToggleFilter = (filterName: string, value: any) => {
+  const handleToggleFilter = (filterName: string, value: string) => {
     // Check if the current filter is the dateRange, which isn't an array
     if (filterName === 'dateRange') {
       // Handle dateRange separately as an object
@@ -73,10 +73,12 @@ export const ClassFilters = ({ filters, onFilterChange, trainers }: ClassFilters
       filterName === 'room' || 
       filterName === 'availability'
     ) {
-      // Now TypeScript knows these are array properties
-      const currentValues = filters[filterName as 'timeOfDay' | 'classType' | 'trainerId' | 'room' | 'availability'];
+      // Use the correct type for the specific filter
+      type FilterKey = 'timeOfDay' | 'classType' | 'trainerId' | 'room' | 'availability';
+      const key = filterName as FilterKey;
+      const currentValues = filters[key];
       
-      // Since we've verified the filter name, we know it's a string array or similar
+      // Now TypeScript knows these values are arrays
       const newValues = currentValues.includes(value)
         ? currentValues.filter(v => v !== value)
         : [...currentValues, value];
