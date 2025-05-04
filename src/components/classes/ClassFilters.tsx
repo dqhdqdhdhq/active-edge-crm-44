@@ -58,12 +58,24 @@ export const ClassFilters = ({ filters, onFilterChange, trainers }: ClassFilters
 
   // Handle toggle arrays (timeOfDay, classType, etc)
   const handleToggleFilter = (filterName: string, value: any) => {
-    const currentValues = [...filters[filterName as keyof typeof filters]] as any[];
-    const newValues = currentValues.includes(value)
-      ? currentValues.filter(v => v !== value)
-      : [...currentValues, value];
+    // Fix: Type-check before spreading to ensure we're working with an array
+    const currentValues = filters[filterName as keyof typeof filters];
     
-    onFilterChange({ [filterName]: newValues });
+    // Check if the current filter is the dateRange, which isn't an array
+    if (filterName === 'dateRange') {
+      // Handle dateRange separately as an object
+      onFilterChange({ [filterName]: value });
+      return;
+    }
+    
+    // For array-type filters, spread them safely
+    if (Array.isArray(currentValues)) {
+      const newValues = currentValues.includes(value)
+        ? currentValues.filter(v => v !== value)
+        : [...currentValues, value];
+      
+      onFilterChange({ [filterName]: newValues });
+    }
   };
 
   const resetFilters = () => {
