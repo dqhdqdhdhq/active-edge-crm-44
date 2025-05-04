@@ -45,13 +45,13 @@ export function MemberSearchFilter({ onSearch, onFilterChange }: MemberSearchFil
   };
   
   const handleStatusChange = (value: string) => {
-    const newStatus = value === '' ? undefined : value as MembershipStatus;
+    const newStatus = value === 'all' ? undefined : value as MembershipStatus;
     setStatus(newStatus);
     onFilterChange({ status: newStatus, type, tags: selectedTags });
   };
   
   const handleTypeChange = (value: string) => {
-    const newType = value === '' ? undefined : value as MembershipType;
+    const newType = value === 'all' ? undefined : value as MembershipType;
     setType(newType);
     onFilterChange({ status, type: newType, tags: selectedTags });
   };
@@ -89,24 +89,24 @@ export function MemberSearchFilter({ onSearch, onFilterChange }: MemberSearchFil
         </div>
         
         <div className="flex gap-2">
-          <Select value={status || ''} onValueChange={handleStatusChange}>
+          <Select value={status || 'all'} onValueChange={handleStatusChange}>
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Statuses</SelectItem>
+              <SelectItem value="all">All Statuses</SelectItem>
               {membershipStatuses.map(status => (
                 <SelectItem key={status} value={status}>{status}</SelectItem>
               ))}
             </SelectContent>
           </Select>
           
-          <Select value={type || ''} onValueChange={handleTypeChange}>
+          <Select value={type || 'all'} onValueChange={handleTypeChange}>
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Membership" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Memberships</SelectItem>
+              <SelectItem value="all">All Memberships</SelectItem>
               {membershipTypes.map(type => (
                 <SelectItem key={type} value={type}>{type}</SelectItem>
               ))}
@@ -153,7 +153,7 @@ export function MemberSearchFilter({ onSearch, onFilterChange }: MemberSearchFil
                 variant="ghost" 
                 size="icon" 
                 className="h-4 w-4 ml-1 p-0" 
-                onClick={() => handleStatusChange('')}
+                onClick={() => handleStatusChange('all')}
               >
                 <X className="h-3 w-3" />
               </Button>
@@ -167,7 +167,7 @@ export function MemberSearchFilter({ onSearch, onFilterChange }: MemberSearchFil
                 variant="ghost" 
                 size="icon" 
                 className="h-4 w-4 ml-1 p-0" 
-                onClick={() => handleTypeChange('')}
+                onClick={() => handleTypeChange('all')}
               >
                 <X className="h-3 w-3" />
               </Button>
