@@ -21,21 +21,33 @@ import { format, parseISO, differenceInDays, isValid, formatDistanceToNow, addDa
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { QuickActions } from './QuickActions';
+import { ClassSchedule } from './ClassSchedule';
 
 interface EnhancedCheckInFormProps {
   members: Member[];
   onCheckIn: (memberId: string) => void;
+  initialSearchTerm?: string;
 }
 
 type SearchType = 'name' | 'email' | 'phone' | 'memberId';
 
-export const EnhancedCheckInForm = ({ members, onCheckIn }: EnhancedCheckInFormProps) => {
-  const [searchTerm, setSearchTerm] = useState('');
+export const EnhancedCheckInForm = ({ members, onCheckIn, initialSearchTerm = '' }: EnhancedCheckInFormProps) => {
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const [searchType, setSearchType] = useState<SearchType>('name');
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [acknowledgedAlerts, setAcknowledgedAlerts] = useState<string[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  
+  // Effect to handle initialSearchTerm changes
+  useEffect(() => {
+    if (initialSearchTerm) {
+      setSearchTerm(initialSearchTerm);
+      setShowResults(true);
+    }
+  }, [initialSearchTerm]);
   
   // Format a date safely
   const formatSafeDate = (dateString: string, formatString: string): string => {
@@ -246,6 +258,24 @@ export const EnhancedCheckInForm = ({ members, onCheckIn }: EnhancedCheckInFormP
       default: return 'bg-gray-500';
     }
   };
+  
+  // Handle alert acknowledgement
+  const handleAcknowledgeAlert = () => {
+    if (selectedMember) {
+      setAcknowledgedAlerts([...acknowledgedAlerts, selectedMember.id]);
+    }
+  };
+  
+  // Check if member has unacknowledged alerts
+  const hasUnacknowledgedAlerts = (member: Member) => {
+    return (
+      !acknowledgedAlerts.includes(member.id) && 
+      (isBirthday(member) || 
+       getOutstandingBalance(member) > 0 ||
+       getDaysUntilExpiry(member) <= 7 ||
+       requiresWaiver(member))
+    );
+  };
 
   return (
     <Card className="w-full">
@@ -366,6 +396,16 @@ export const EnhancedCheckInForm = ({ members, onCheckIn }: EnhancedCheckInFormP
               </div>
             </div>
             
+            {/* Quick Actions */}
+            <div>
+              <h4 className="text-sm font-medium mb-2">Quick Actions</h4>
+              <QuickActions 
+                member={selectedMember} 
+                onAcknowledgeAlert={handleAcknowledgeAlert}
+                hasUnacknowledgedAlerts={hasUnacknowledgedAlerts(selectedMember)}
+              />
+            </div>
+            
             {/* Contextual alerts */}
             <div className="space-y-3">
               {/* Expired membership alert */}
@@ -440,6 +480,9 @@ export const EnhancedCheckInForm = ({ members, onCheckIn }: EnhancedCheckInFormP
                 </Alert>
               )}
             </div>
+            
+            {/* Class Schedule */}
+            <ClassSchedule member={selectedMember} />
             
             {/* Membership details */}
             <div className="grid grid-cols-2 gap-3">

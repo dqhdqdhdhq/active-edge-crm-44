@@ -1,4 +1,3 @@
-
 export type MembershipType = 'Standard' | 'Premium' | 'VIP' | 'Student' | 'Senior' | 'Family' | 'Corporate';
 export type MembershipStatus = 'Active' | 'Inactive' | 'Expired' | 'Frozen' | 'Pending';
 export type MemberTag = 'VIP' | 'Personal Training' | 'New Member' | 'Special Needs' | 'Prospect' | 'Corporate';
@@ -85,4 +84,14 @@ export interface DashboardStats {
   expiringMemberships: number;
   upcomingClasses: number;
   newMembers: number;
+}
+
+export interface Guest {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  relatedMemberId?: string;
+  waiverSigned: boolean;
+  checkInDateTime: string;
 }
