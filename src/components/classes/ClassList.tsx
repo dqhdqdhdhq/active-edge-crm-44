@@ -1,4 +1,3 @@
-
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,9 +9,10 @@ interface ClassListProps {
   classes: GymClass[];
   trainers: Trainer[];
   compact?: boolean;
+  onViewClass?: (gymClass: GymClass) => void;
 }
 
-export const ClassList = ({ classes, trainers, compact = false }: ClassListProps) => {
+export const ClassList = ({ classes, trainers, compact = false, onViewClass }: ClassListProps) => {
   // Helper to get trainer name
   const getTrainerName = (trainerId: string) => {
     const trainer = trainers.find(t => t.id === trainerId);
@@ -104,7 +104,11 @@ export const ClassList = ({ classes, trainers, compact = false }: ClassListProps
                     </TableCell>
                   )}
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => onViewClass && onViewClass(cls)}
+                    >
                       <Eye className="h-4 w-4" />
                     </Button>
                   </TableCell>
