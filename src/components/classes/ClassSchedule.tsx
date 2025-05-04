@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { GymClass } from '@/lib/types';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
+import { format, addDays, startOfWeek, isSameDay, addWeeks, subWeeks } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { ClassCard } from './ClassCard';
 
@@ -17,6 +17,7 @@ interface ClassScheduleProps {
 export const ClassSchedule = ({ classes, trainers }: ClassScheduleProps) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [view, setView] = useState<'day' | 'week'>('week'); // Added view state
   
   // Calculate the start of the current week
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 }); // Start on Monday
@@ -27,7 +28,8 @@ export const ClassSchedule = ({ classes, trainers }: ClassScheduleProps) => {
     return {
       date,
       dayName: format(date, 'EEE'),
-      dayNumber: format(date, 'd')
+      dayNumber: format(date, 'd'),
+      month: format(date, 'MMM')
     };
   });
   
@@ -46,16 +48,42 @@ export const ClassSchedule = ({ classes, trainers }: ClassScheduleProps) => {
     return trainer ? `${trainer.firstName} ${trainer.lastName}` : 'Unknown';
   };
   
-  // Navigate to previous week
+  // Navigation functions
   const previousWeek = () => {
-    const newDate = addDays(currentDate, -7);
+    const newDate = subWeeks(currentDate, 1);
     setCurrentDate(newDate);
   };
   
-  // Navigate to next week
   const nextWeek = () => {
-    const newDate = addDays(currentDate, 7);
+    const newDate = addWeeks(currentDate, 1);
     setCurrentDate(newDate);
+  };
+  
+  const today = () => {
+    setCurrentDate(new Date());
+    setSelectedDate(new Date());
+  };
+
+  // Helper to determine class type color
+  const getClassTypeColor = (type: string) => {
+    switch(type) {
+      case 'Yoga':
+      case 'Pilates':
+        return 'bg-purple-100 border-purple-300 text-purple-800';
+      case 'Spin':
+        return 'bg-blue-100 border-blue-300 text-blue-800';
+      case 'HIIT':
+      case 'CrossFit':
+        return 'bg-red-100 border-red-300 text-red-800';
+      case 'Zumba':
+        return 'bg-pink-100 border-pink-300 text-pink-800';
+      case 'Boxing':
+        return 'bg-orange-100 border-orange-300 text-orange-800';
+      case 'Strength':
+        return 'bg-emerald-100 border-emerald-300 text-emerald-800';
+      default:
+        return 'bg-gray-100 border-gray-300 text-gray-800';
+    }
   };
 
   return (
@@ -65,6 +93,9 @@ export const ClassSchedule = ({ classes, trainers }: ClassScheduleProps) => {
           <div className="flex items-center justify-between">
             <CardTitle>Class Schedule</CardTitle>
             <div className="flex items-center gap-1">
+              <Button variant="outline" size="sm" onClick={today}>
+                Today
+              </Button>
               <Button size="sm" variant="outline" onClick={previousWeek}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -81,12 +112,12 @@ export const ClassSchedule = ({ classes, trainers }: ClassScheduleProps) => {
         </CardHeader>
         <CardContent>
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-            {weekDays.map(({ date, dayName, dayNumber }) => (
+            {weekDays.map(({ date, dayName, dayNumber, month }) => (
               <Button
                 key={dayNumber}
                 variant={isSameDay(date, selectedDate) ? "default" : "outline"}
                 className={cn(
-                  "flex flex-col items-center px-3 h-auto py-2 min-w-[60px]",
+                  "flex flex-col items-center px-3 h-auto py-2 min-w-[70px]",
                   isSameDay(date, new Date()) && !isSameDay(date, selectedDate) && "border-primary"
                 )}
                 onClick={() => setSelectedDate(date)}
@@ -98,14 +129,31 @@ export const ClassSchedule = ({ classes, trainers }: ClassScheduleProps) => {
                 )}>
                   {dayNumber}
                 </span>
+                <span className="text-xs font-light">{month}</span>
               </Button>
             ))}
           </div>
           
           <div className="space-y-3">
-            <h3 className="text-sm font-medium">
-              {format(selectedDate, 'EEEE, MMMM d')}
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium">
+                {format(selectedDate, 'EEEE, MMMM d')}
+              </h3>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-purple-400"></span>
+                  Yoga/Pilates
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                  Spin
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-red-400"></span>
+                  HIIT/CrossFit
+                </span>
+              </div>
+            </div>
             
             {classesForSelectedDate.length > 0 ? (
               <div className="space-y-3">
