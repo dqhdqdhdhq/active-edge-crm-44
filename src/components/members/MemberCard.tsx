@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Member } from "@/lib/types";
-import { format, parseISO, differenceInDays } from "date-fns";
+import { format, parseISO, differenceInDays, isValid } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Edit, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,13 +26,38 @@ export const getMembershipStatusColor = (status: string) => {
 };
 
 export const MemberCard = ({ member }: { member: Member }) => {
-  const daysUntilExpiry = differenceInDays(
-    new Date(member.membershipEndDate),
-    new Date()
-  );
+  // Safely parse the expiry date
+  const expiryDate = parseISO(member.membershipEndDate);
+  const daysUntilExpiry = isValid(expiryDate) ? 
+    differenceInDays(expiryDate, new Date()) : 
+    0;
   
   const isExpiringSoon = daysUntilExpiry > 0 && daysUntilExpiry <= 30;
   const isExpired = daysUntilExpiry <= 0;
+  
+  // Safe formatting function that handles invalid dates
+  const formatSafeDate = (dateString: string, formatString: string) => {
+    try {
+      const date = parseISO(dateString);
+      if (!isValid(date)) return 'Invalid date';
+      return format(date, formatString);
+    } catch (error) {
+      return 'Invalid date';
+    }
+  };
+  
+  // Get the last check-in date safely
+  const getLastCheckInDate = () => {
+    if (member.checkIns.length === 0) return 'Never';
+    
+    try {
+      const lastCheckIn = new Date(member.checkIns[0].dateTime);
+      if (!isValid(lastCheckIn)) return 'Invalid date';
+      return format(lastCheckIn, 'MMM d');
+    } catch (error) {
+      return 'Invalid date';
+    }
+  };
   
   return (
     <Card className="overflow-hidden">
@@ -83,17 +108,14 @@ export const MemberCard = ({ member }: { member: Member }) => {
               isExpired ? "text-destructive" : 
               isExpiringSoon ? "text-orange-500" : ""
             )}>
-              {format(parseISO(member.membershipEndDate), 'MMM d, yyyy')}
+              {formatSafeDate(member.membershipEndDate, 'MMM d, yyyy')}
             </span>
           </div>
           
           <div className="flex justify-between">
             <span className="text-muted-foreground">Last visit</span>
             <span className="font-medium">
-              {member.checkIns.length > 0 
-                ? format(new Date(member.checkIns[0].dateTime), 'MMM d')
-                : 'Never'
-              }
+              {getLastCheckInDate()}
             </span>
           </div>
         </div>
