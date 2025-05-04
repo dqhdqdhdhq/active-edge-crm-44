@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Calendar, TrendingUp, ArrowUpRight, Timer, UserPlus } from 'lucide-react';
-import { DashboardStats } from '@/lib/types';
+import type { DashboardStats as DashboardStatsType } from '@/lib/types';
 
 interface StatCardProps {
   title: string;
@@ -29,7 +29,7 @@ const StatCard = ({ title, value, icon, trend, description }: StatCardProps) => 
   );
 };
 
-export function DashboardStats({ stats }: { stats: DashboardStats }) {
+export function DashboardStats({ stats }: { stats: DashboardStatsType }) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       <StatCard
