@@ -12,9 +12,10 @@ import { ClassCard } from './ClassCard';
 interface ClassScheduleProps {
   classes: GymClass[];
   trainers: { id: string; firstName: string; lastName: string; }[];
+  onViewClass?: (gymClass: GymClass) => void;
 }
 
-export const ClassSchedule = ({ classes, trainers }: ClassScheduleProps) => {
+export const ClassSchedule = ({ classes, trainers, onViewClass }: ClassScheduleProps) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [view, setView] = useState<'day' | 'week'>('week'); // Added view state
@@ -162,6 +163,7 @@ export const ClassSchedule = ({ classes, trainers }: ClassScheduleProps) => {
                     key={cls.id} 
                     gymClass={cls} 
                     trainerName={getTrainerName(cls.trainerId)} 
+                    onViewClass={onViewClass}
                   />
                 ))}
               </div>

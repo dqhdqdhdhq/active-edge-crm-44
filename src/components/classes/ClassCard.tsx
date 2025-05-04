@@ -3,14 +3,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { GymClass } from "@/lib/types";
-import { Clock, Users, MapPin } from "lucide-react";
+import { Clock, Users, MapPin, Eye } from "lucide-react";
 
 interface ClassCardProps {
   gymClass: GymClass;
   trainerName: string;
+  onViewClass?: (gymClass: GymClass) => void;
 }
 
-export const ClassCard = ({ gymClass, trainerName }: ClassCardProps) => {
+export const ClassCard = ({ gymClass, trainerName, onViewClass }: ClassCardProps) => {
   const { name, type, description, room, startTime, endTime, capacity, attendees } = gymClass;
   
   // Calculate attendance percentage
@@ -30,6 +31,12 @@ export const ClassCard = ({ gymClass, trainerName }: ClassCardProps) => {
         return 'default';
       default:
         return 'outline';
+    }
+  };
+
+  const handleViewDetails = () => {
+    if (onViewClass) {
+      onViewClass(gymClass);
     }
   };
 
@@ -78,7 +85,10 @@ export const ClassCard = ({ gymClass, trainerName }: ClassCardProps) => {
         </div>
         
         <div className="mt-4 flex justify-end gap-2">
-          <Button variant="outline" size="sm">View Details</Button>
+          <Button variant="outline" size="sm" onClick={handleViewDetails}>
+            <Eye className="mr-2 h-4 w-4" />
+            View Details
+          </Button>
           <Button size="sm">Book Class</Button>
         </div>
       </CardContent>
