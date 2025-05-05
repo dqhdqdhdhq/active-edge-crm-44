@@ -4,11 +4,19 @@ import { MemberSearchFilter } from '@/components/members/MemberSearchFilter';
 import { MemberList } from '@/components/members/MemberList';
 import { Button } from '@/components/ui/button';
 import { members } from '@/data/mockData';
-import { MemberTag, MembershipStatus, MembershipType } from '@/lib/types';
+import { Member, MemberTag, MembershipStatus, MembershipType } from '@/lib/types';
 import { UserPlus } from 'lucide-react';
+import { MemberProfileDialog } from '@/components/members/MemberProfileDialog';
 
 const Members = () => {
   const [filteredMembers, setFilteredMembers] = useState(members);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  
+  const handleViewMember = (member: Member) => {
+    setSelectedMember(member);
+    setProfileDialogOpen(true);
+  };
   
   const handleSearch = (searchTerm: string) => {
     if (!searchTerm.trim()) {
@@ -72,7 +80,13 @@ const Members = () => {
         onFilterChange={handleFilterChange}
       />
       
-      <MemberList members={filteredMembers} />
+      <MemberList members={filteredMembers} onViewMember={handleViewMember} />
+      
+      <MemberProfileDialog 
+        member={selectedMember} 
+        open={profileDialogOpen} 
+        onOpenChange={setProfileDialogOpen} 
+      />
     </div>
   );
 };

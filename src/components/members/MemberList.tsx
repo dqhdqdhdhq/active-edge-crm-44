@@ -8,9 +8,10 @@ import { cn } from '@/lib/utils';
 
 interface MemberListProps {
   members: Member[];
+  onViewMember: (member: Member) => void;
 }
 
-export const MemberList = ({ members }: MemberListProps) => {
+export const MemberList = ({ members, onViewMember }: MemberListProps) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   return (
@@ -40,7 +41,11 @@ export const MemberList = ({ members }: MemberListProps) => {
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {members.map(member => (
-            <MemberCard key={member.id} member={member} />
+            <MemberCard 
+              key={member.id} 
+              member={member} 
+              onView={() => onViewMember(member)} 
+            />
           ))}
         </div>
       ) : (
@@ -57,7 +62,13 @@ export const MemberList = ({ members }: MemberListProps) => {
                 <span className="font-medium">{member.firstName} {member.lastName}</span>
                 <span className="text-sm text-muted-foreground">{member.membershipType}</span>
               </div>
-              <Button variant="ghost" size="sm">View</Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => onViewMember(member)}
+              >
+                View
+              </Button>
             </div>
           ))}
         </div>

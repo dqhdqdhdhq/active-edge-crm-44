@@ -25,7 +25,12 @@ export const getMembershipStatusColor = (status: string) => {
   }
 };
 
-export const MemberCard = ({ member }: { member: Member }) => {
+interface MemberCardProps {
+  member: Member;
+  onView: () => void;
+}
+
+export const MemberCard = ({ member, onView }: MemberCardProps) => {
   // Safely parse the expiry date
   const expiryDate = parseISO(member.membershipEndDate);
   const daysUntilExpiry = isValid(expiryDate) ? 
@@ -129,7 +134,7 @@ export const MemberCard = ({ member }: { member: Member }) => {
         </div>
         
         <div className="mt-4">
-          <Button variant="outline" size="sm" className="w-full">
+          <Button variant="outline" size="sm" className="w-full" onClick={onView}>
             <Edit className="mr-2 h-3.5 w-3.5" />
             View Profile
           </Button>
