@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Member, Trainer } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -28,6 +27,7 @@ interface MemberProfileDialogProps {
   member: Member | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onEditClick?: () => void;
 }
 
 const formatSafeDate = (dateString: string, formatString: string = 'MMM d, yyyy') => {
@@ -50,7 +50,7 @@ const calculateAge = (dateString: string) => {
   }
 };
 
-export function MemberProfileDialog({ member, open, onOpenChange }: MemberProfileDialogProps) {
+export function MemberProfileDialog({ member, open, onOpenChange, onEditClick }: MemberProfileDialogProps) {
   const [activeTab, setActiveTab] = useState("overview");
   
   if (!member) return null;
@@ -89,7 +89,7 @@ export function MemberProfileDialog({ member, open, onOpenChange }: MemberProfil
                 </div>
               </div>
             </div>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={onEditClick}>
               <Edit className="mr-2 h-4 w-4" />
               Edit Profile
             </Button>
