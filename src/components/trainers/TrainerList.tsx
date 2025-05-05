@@ -8,9 +8,10 @@ import { Calendar, Mail } from "lucide-react";
 interface TrainerListProps {
   trainers: Trainer[];
   onViewTrainer: (trainer: Trainer) => void;
+  onEditTrainer?: (trainer: Trainer) => void;
 }
 
-export function TrainerList({ trainers, onViewTrainer }: TrainerListProps) {
+export function TrainerList({ trainers, onViewTrainer, onEditTrainer }: TrainerListProps) {
   return (
     <div className="space-y-2 border rounded-md overflow-hidden">
       <div className="bg-muted px-4 py-2 grid grid-cols-12 gap-2 text-sm font-medium">
@@ -68,7 +69,7 @@ export function TrainerList({ trainers, onViewTrainer }: TrainerListProps) {
               </div>
             </div>
             
-            <div className="col-span-1 text-right">
+            <div className="col-span-1 flex gap-1 justify-end">
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -76,6 +77,15 @@ export function TrainerList({ trainers, onViewTrainer }: TrainerListProps) {
               >
                 View
               </Button>
+              {onEditTrainer && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => onEditTrainer(trainer)}
+                >
+                  Edit
+                </Button>
+              )}
             </div>
           </div>
         ))

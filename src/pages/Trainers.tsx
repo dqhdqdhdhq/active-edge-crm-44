@@ -18,7 +18,10 @@ import {
   Search, 
   Filter, 
   Grid, 
-  List as ListIcon 
+  List as ListIcon,
+  BarChart,
+  FileText,
+  Users
 } from "lucide-react";
 import { trainers } from "@/data/mockData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,6 +37,7 @@ import { TrainerFormDialog } from "@/components/trainers/TrainerFormDialog";
 import { TrainerList } from "@/components/trainers/TrainerList";
 import { Trainer } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { TrainerPerformanceMetrics } from "@/components/trainers/TrainerPerformanceMetrics";
 
 // Simple function to generate a pseudo-random ID
 const generateId = () => {
@@ -43,13 +47,13 @@ const generateId = () => {
 const Trainers = () => {
   const [trainersList, setTrainersList] = useState(trainers);
   const [filteredTrainers, setFilteredTrainers] = useState(trainers);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedTrainer, setSelectedTrainer] = useState<Trainer | null>(null);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [addTrainerDialogOpen, setAddTrainerDialogOpen] = useState(false);
   const [editTrainerDialogOpen, setEditTrainerDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [showPerformanceMetrics, setShowPerformanceMetrics] = useState(false);
   
   const { toast } = useToast();
 
@@ -58,8 +62,13 @@ const Trainers = () => {
     setProfileDialogOpen(true);
   };
 
-  const handleEditTrainer = () => {
-    if (selectedTrainer) {
+  const handleEditTrainer = (trainer?: Trainer) => {
+    if (trainer) {
+      // Direct edit from list view
+      setSelectedTrainer(trainer);
+      setEditTrainerDialogOpen(true);
+    } else if (selectedTrainer) {
+      // Edit from profile dialog
       setProfileDialogOpen(false);
       setEditTrainerDialogOpen(true);
     }
@@ -157,10 +166,21 @@ const Trainers = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold tracking-tight">Trainers</h1>
-        <Button onClick={() => setAddTrainerDialogOpen(true)}>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Add Trainer
-        </Button>
+        <div className="flex gap-2">
+          {selectedTrainer && (
+            <Button 
+              variant="outline" 
+              onClick={() => setShowPerformanceMetrics(true)}
+            >
+              <BarChart className="mr-2 h-4 w-4" />
+              View Performance
+            </Button>
+          )}
+          <Button onClick={() => setAddTrainerDialogOpen(true)}>
+            <UserPlus className="mr-2 h-4 w-4" />
+            Add Trainer
+          </Button>
+        </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -172,7 +192,10 @@ const Trainers = () => {
               placeholder="Search trainers..."
               className="pl-8"
               value={searchQuery}
-              onChange={handleSearch}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                handleSearch(e);
+              }}
             />
           </div>
           
@@ -288,7 +311,8 @@ const Trainers = () => {
       ) : (
         <TrainerList 
           trainers={filteredTrainers} 
-          onViewTrainer={handleViewTrainer} 
+          onViewTrainer={handleViewTrainer}
+          onEditTrainer={handleEditTrainer}
         />
       )}
       
@@ -310,6 +334,12 @@ const Trainers = () => {
         open={addTrainerDialogOpen} 
         onOpenChange={setAddTrainerDialogOpen}
         onSave={handleSaveTrainer}
+      />
+      
+      <TrainerPerformanceMetrics
+        trainer={selectedTrainer}
+        open={showPerformanceMetrics}
+        onOpenChange={setShowPerformanceMetrics}
       />
     </div>
   );
