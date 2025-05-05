@@ -9,9 +9,10 @@ interface ActivityProps {
   checkIns: CheckIn[];
   classes: GymClass[];
   notes: Note[];
+  userRole: 'admin' | 'front-desk' | 'trainer';
 }
 
-export function RecentActivity({ checkIns, classes, notes }: ActivityProps) {
+export function RecentActivity({ checkIns, classes, notes, userRole }: ActivityProps) {
   // Helper function to get member by ID
   const getMember = (id: string): Member | undefined => {
     return allMembers.find(member => member.id === id);
@@ -44,6 +45,9 @@ export function RecentActivity({ checkIns, classes, notes }: ActivityProps) {
       date: format(new Date(note.createdAt), 'MMM d')
     };
   });
+
+  // We can use userRole to conditionally render certain items or apply specific styling
+  // For example, we might want to highlight notes relevant to trainers if userRole is 'trainer'
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
