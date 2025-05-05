@@ -11,6 +11,7 @@ import Classes from "./pages/Classes";
 import Trainers from "./pages/Trainers";
 import CheckIn from "./pages/CheckIn";
 import Reports from "./pages/Reports";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,8 +30,7 @@ const App = () => (
             <Route path="trainers" element={<Trainers />} />
             <Route path="check-in" element={<CheckIn />} />
             <Route path="reports" element={<Reports />} />
-            {/* Settings page would be added later */}
-            <Route path="settings" element={<div className="p-4">Settings page (under development)</div>} />
+            <Route path="settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
@@ -40,3 +40,4 @@ const App = () => (
 );
 
 export default App;
+
