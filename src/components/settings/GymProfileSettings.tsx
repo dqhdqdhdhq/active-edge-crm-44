@@ -39,10 +39,10 @@ export function GymProfileSettings() {
     
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
-      setGymData(prev => ({
+      setGymData((prev) => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof typeof prev],
+          ...(prev[parent as keyof typeof prev] as Record<string, any>),
           [child]: value
         }
       }));
