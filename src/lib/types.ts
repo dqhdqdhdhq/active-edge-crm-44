@@ -97,9 +97,6 @@ export interface DashboardStats {
   expiringMemberships: number;
   upcomingClasses: number;
   newMembers: number;
-  todayRevenue?: number;
-  currentUsers?: number;
-  classAttendance?: number;
 }
 
 export interface Guest {

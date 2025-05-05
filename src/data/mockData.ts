@@ -1,3 +1,4 @@
+
 import { Member, GymClass, Trainer, CheckIn, Note, DashboardStats } from '../lib/types';
 
 // Helper function to get a date in ISO format
@@ -354,56 +355,13 @@ export const notes: Note[] = [
 ];
 
 // Dashboard stats
-export const dashboardStats = {
-  todayCheckIns: 47,
-  activeMembers: 543,
-  expiringMemberships: 18,
-  upcomingClasses: 12,
-  newMembers: 7,
-  todayRevenue: 2850,
-  currentUsers: 23,
-  classAttendance: 78
+export const dashboardStats: DashboardStats = {
+  todayCheckIns: 27,
+  activeMembers: 187,
+  expiringMemberships: 12,
+  upcomingClasses: 8,
+  newMembers: 5
 };
-
-// Add mock data for trainer performance if not already there
-export const trainerPerformance = [
-  {
-    trainerId: "1",
-    trainerName: "John Smith",
-    classesCount: 28,
-    attendanceRate: 92,
-    clientRetentionRate: 95,
-    ptSessionsCount: 45,
-    memberFeedback: 4.9,
-    revenueGenerated: 4500,
-    rankLastMonth: 1,
-    rankChange: 0
-  },
-  {
-    trainerId: "2",
-    trainerName: "Sarah Johnson",
-    classesCount: 24,
-    attendanceRate: 88,
-    clientRetentionRate: 90,
-    ptSessionsCount: 38,
-    memberFeedback: 4.7,
-    revenueGenerated: 3800,
-    rankLastMonth: 3,
-    rankChange: 1
-  },
-  {
-    trainerId: "3",
-    trainerName: "Michael Wilson",
-    classesCount: 22,
-    attendanceRate: 85,
-    clientRetentionRate: 87,
-    ptSessionsCount: 32,
-    memberFeedback: 4.5,
-    revenueGenerated: 3200,
-    rankLastMonth: 2,
-    rankChange: -1
-  }
-];
 
 // Generate monthly check-in data for charts
 export const generateMonthlyCheckInData = () => {
