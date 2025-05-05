@@ -1,3 +1,4 @@
+
 export type MembershipType = 'Standard' | 'Premium' | 'VIP' | 'Student' | 'Senior' | 'Family' | 'Corporate';
 export type MembershipStatus = 'Active' | 'Inactive' | 'Expired' | 'Frozen' | 'Pending';
 export type MemberTag = 'VIP' | 'Personal Training' | 'New Member' | 'Special Needs' | 'Prospect' | 'Corporate';
@@ -26,6 +27,17 @@ export interface Member {
   checkIns: CheckIn[];
 }
 
+export interface TrainerPerformance {
+  classesCount: number;
+  attendanceRate: number;
+  clientRetentionRate: number;
+  ptSessionsCount: number;
+  memberFeedback: number;
+  revenueGenerated: number;
+  rankLastMonth?: number;
+  rankChange?: number;
+}
+
 export interface Trainer {
   id: string;
   firstName: string;
@@ -43,6 +55,7 @@ export interface Trainer {
   }[];
   assignedClasses: string[];
   assignedMembers: string[];
+  performance?: TrainerPerformance;
 }
 
 export interface GymClass {

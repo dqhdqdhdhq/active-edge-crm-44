@@ -38,6 +38,7 @@ import { TrainerList } from "@/components/trainers/TrainerList";
 import { Trainer } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { TrainerPerformanceMetrics } from "@/components/trainers/TrainerPerformanceMetrics";
+import { TrainerLeaderboard } from "@/components/trainers/TrainerLeaderboard";
 
 // Simple function to generate a pseudo-random ID
 const generateId = () => {
@@ -54,8 +55,9 @@ const Trainers = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [showPerformanceMetrics, setShowPerformanceMetrics] = useState(false);
-  // Add the missing viewMode state
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [showLeaderboard, setShowLeaderboard] = useState(true);
+  const [leaderboardPeriod, setLeaderboardPeriod] = useState<"thisMonth" | "lastMonth">("thisMonth");
   
   const { toast } = useToast();
 
@@ -184,6 +186,32 @@ const Trainers = () => {
           </Button>
         </div>
       </div>
+      
+      <div className="flex items-center justify-between">
+        <div className="flex gap-2">
+          <Button 
+            variant={showLeaderboard ? "default" : "outline"} 
+            onClick={() => setShowLeaderboard(true)}
+          >
+            <Users className="mr-2 h-4 w-4" />
+            Show Leaderboard
+          </Button>
+          <Button 
+            variant={!showLeaderboard ? "default" : "outline"}
+            onClick={() => setShowLeaderboard(false)}
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            Hide Leaderboard
+          </Button>
+        </div>
+      </div>
+      
+      {showLeaderboard && (
+        <TrainerLeaderboard 
+          trainers={trainersList} 
+          period={leaderboardPeriod} 
+        />
+      )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex items-center space-x-2">
