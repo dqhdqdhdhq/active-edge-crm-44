@@ -12,10 +12,10 @@ import {
   Link as LinkIcon,
   Building
 } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { GymProfileSettings } from "@/components/settings/GymProfileSettings";
 import { PageTitle } from "@/components/ui/page-title";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("gym-profile");
@@ -25,14 +25,14 @@ const Settings = () => {
       <PageTitle title="Settings" description="Configure your gym management system" />
       
       <div className="flex flex-col md:flex-row gap-6 mt-6">
-        {/* Settings Sidebar */}
-        <div className="w-full md:w-64 space-y-1">
-          <Tabs 
-            value={activeTab} 
-            onValueChange={setActiveTab}
-            orientation="vertical"
-            className="w-full"
-          >
+        {/* Using a single Tabs component that wraps both the sidebar and content */}
+        <Tabs 
+          value={activeTab} 
+          onValueChange={setActiveTab}
+          className="w-full flex flex-col md:flex-row gap-6"
+        >
+          {/* Settings Sidebar */}
+          <div className="w-full md:w-64 space-y-1">
             <TabsList className="flex flex-col h-auto bg-card p-2 gap-1 w-full">
               <TabsTrigger 
                 value="gym-profile" 
@@ -98,119 +98,119 @@ const Settings = () => {
                 <span>Data Management</span>
               </TabsTrigger>
             </TabsList>
-          </Tabs>
-        </div>
-        
-        {/* Settings Content */}
-        <div className="flex-1">
-          <TabsContent value="gym-profile" className="mt-0">
-            <GymProfileSettings />
-          </TabsContent>
-          <TabsContent value="membership" className="mt-0">
-            <Card>
-              <CardHeader>
-                <CardTitle>Membership Settings</CardTitle>
-                <CardDescription>
-                  Configure membership types, policies, and related settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Membership settings will be implemented soon.</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="classes" className="mt-0">
-            <Card>
-              <CardHeader>
-                <CardTitle>Classes & Scheduling</CardTitle>
-                <CardDescription>
-                  Manage class types, booking rules, and resources
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Class and scheduling settings will be implemented soon.</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="users" className="mt-0">
-            <Card>
-              <CardHeader>
-                <CardTitle>Users & Roles</CardTitle>
-                <CardDescription>
-                  Manage user accounts, roles, and permissions
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">User management settings will be implemented soon.</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="billing" className="mt-0">
-            <Card>
-              <CardHeader>
-                <CardTitle>Billing & Payments</CardTitle>
-                <CardDescription>
-                  Configure payment gateways, tax rules, and invoice settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Billing settings will be implemented soon.</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="notifications" className="mt-0">
-            <Card>
-              <CardHeader>
-                <CardTitle>Notifications</CardTitle>
-                <CardDescription>
-                  Customize email templates and notification settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Notification settings will be implemented soon.</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="customization" className="mt-0">
-            <Card>
-              <CardHeader>
-                <CardTitle>Customization</CardTitle>
-                <CardDescription>
-                  Manage tags, custom fields, and other customization options
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Customization settings will be implemented soon.</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="integrations" className="mt-0">
-            <Card>
-              <CardHeader>
-                <CardTitle>Integrations</CardTitle>
-                <CardDescription>
-                  Connect with third-party services and tools
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Integration settings will be implemented soon.</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="data" className="mt-0">
-            <Card>
-              <CardHeader>
-                <CardTitle>Data Management</CardTitle>
-                <CardDescription>
-                  Manage backups, imports, exports, and audit logs
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Data management settings will be implemented soon.</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </div>
+          </div>
+          
+          {/* Settings Content */}
+          <div className="flex-1">
+            <TabsContent value="gym-profile" className="mt-0 data-[state=inactive]:hidden">
+              <GymProfileSettings />
+            </TabsContent>
+            <TabsContent value="membership" className="mt-0 data-[state=inactive]:hidden">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Membership Settings</CardTitle>
+                  <CardDescription>
+                    Configure membership types, policies, and related settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Membership settings will be implemented soon.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="classes" className="mt-0 data-[state=inactive]:hidden">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Classes & Scheduling</CardTitle>
+                  <CardDescription>
+                    Manage class types, booking rules, and resources
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Class and scheduling settings will be implemented soon.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="users" className="mt-0 data-[state=inactive]:hidden">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Users & Roles</CardTitle>
+                  <CardDescription>
+                    Manage user accounts, roles, and permissions
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">User management settings will be implemented soon.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="billing" className="mt-0 data-[state=inactive]:hidden">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Billing & Payments</CardTitle>
+                  <CardDescription>
+                    Configure payment gateways, tax rules, and invoice settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Billing settings will be implemented soon.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="notifications" className="mt-0 data-[state=inactive]:hidden">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Notifications</CardTitle>
+                  <CardDescription>
+                    Customize email templates and notification settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Notification settings will be implemented soon.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="customization" className="mt-0 data-[state=inactive]:hidden">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Customization</CardTitle>
+                  <CardDescription>
+                    Manage tags, custom fields, and other customization options
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Customization settings will be implemented soon.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="integrations" className="mt-0 data-[state=inactive]:hidden">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Integrations</CardTitle>
+                  <CardDescription>
+                    Connect with third-party services and tools
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Integration settings will be implemented soon.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="data" className="mt-0 data-[state=inactive]:hidden">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Data Management</CardTitle>
+                  <CardDescription>
+                    Manage backups, imports, exports, and audit logs
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Data management settings will be implemented soon.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </div>
+        </Tabs>
       </div>
     </div>
   );
