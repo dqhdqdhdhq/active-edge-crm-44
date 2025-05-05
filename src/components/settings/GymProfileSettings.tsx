@@ -8,9 +8,32 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
+// Define the GymData type for better type safety
+interface GymData {
+  name: string;
+  email: string;
+  phone: string;
+  website: string;
+  facebook: string;
+  instagram: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
+  operationalSettings: {
+    timeZone: string;
+    currency: string;
+    dateFormat: string;
+    timeFormat: string;
+  };
+}
+
 export function GymProfileSettings() {
   // Initial mock data for the gym profile
-  const [gymData, setGymData] = useState({
+  const [gymData, setGymData] = useState<GymData>({
     name: "ActiveEdge Fitness",
     email: "contact@activeedgefitness.com",
     phone: "(555) 123-4567",
@@ -42,7 +65,7 @@ export function GymProfileSettings() {
       setGymData((prev) => ({
         ...prev,
         [parent]: {
-          ...(prev[parent as keyof typeof prev] as Record<string, any>),
+          ...(prev[parent as keyof typeof prev] as Record<string, string>),
           [child]: value
         }
       }));
