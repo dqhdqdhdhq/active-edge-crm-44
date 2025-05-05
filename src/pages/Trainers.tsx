@@ -54,6 +54,8 @@ const Trainers = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [showPerformanceMetrics, setShowPerformanceMetrics] = useState(false);
+  // Add the missing viewMode state
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   
   const { toast } = useToast();
 
