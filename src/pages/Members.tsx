@@ -8,7 +8,11 @@ import { UserPlus } from 'lucide-react';
 import { MemberProfileDialog } from '@/components/members/MemberProfileDialog';
 import { MemberFormDialog } from '@/components/members/MemberFormDialog';
 import { useToast } from '@/hooks/use-toast';
-import { v4 as uuidv4 } from 'uuid';
+
+// Simple function to generate a pseudo-random ID
+const generateId = () => {
+  return Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
+};
 
 const Members = () => {
   const [membersList, setMembersList] = useState(members);
@@ -53,7 +57,7 @@ const Members = () => {
     } else {
       // Add new member
       const newMember = {
-        id: uuidv4(),
+        id: generateId(), // Using our custom ID generator instead of uuid
         checkIns: [],
         ...updatedMember,
       } as Member;
