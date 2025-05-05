@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { MemberSearchFilter } from '@/components/members/MemberSearchFilter';
 import { MemberList } from '@/components/members/MemberList';
