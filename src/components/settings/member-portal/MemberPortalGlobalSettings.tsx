@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { ColorSwatchIcon, UploadIcon } from "lucide-react";
+import { Palette, Upload as UploadIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { MemberPortalConfig } from "@/lib/types";
@@ -195,7 +195,7 @@ export function MemberPortalGlobalSettings({
                   onClick={() => handleColorSchemeSelect(scheme.id)}
                 >
                   <div className="flex items-center gap-2">
-                    <ColorSwatchIcon className="h-4 w-4" />
+                    <Palette className="h-4 w-4" />
                     <span className="text-sm font-medium">{scheme.name}</span>
                   </div>
                   {scheme.id !== 'custom' && (
