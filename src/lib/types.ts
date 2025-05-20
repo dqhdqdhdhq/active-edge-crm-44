@@ -1,4 +1,3 @@
-
 export interface Member {
   id: string;
   firstName: string;
@@ -250,4 +249,149 @@ export interface TrainerPerformance {
   revenueGenerated: number;
   rankLastMonth?: number;
   rankChange?: number;
+}
+
+export interface MemberPortalConfig {
+  // Global Portal Configuration
+  portalEnabled: boolean;
+  portalUrl: string;
+  autoInviteNewMembers: boolean;
+  
+  // Branding & Appearance
+  logo?: string;
+  favicon?: string;
+  colorScheme: 'light' | 'dark' | 'primary' | 'custom';
+  primaryColor?: string;
+  secondaryColor?: string;
+  welcomeMessage: string;
+  footerText: string;
+  
+  // Feature Configuration
+  features: {
+    profile: {
+      viewProfile: boolean;
+      editContactDetails: boolean;
+      editEmergencyContact: boolean;
+      uploadProfilePicture: boolean;
+      updateCommunicationPreferences: boolean;
+      changePassword: boolean;
+      viewMembershipDetails: boolean;
+      viewContractDocuments: boolean;
+      viewPaymentMethods: boolean;
+      updatePaymentMethods: boolean;
+      viewBillingHistory: boolean;
+      downloadInvoices: boolean;
+    };
+    bookings: {
+      enableClassBooking: boolean;
+      bookingWindow: number; // days in advance
+      cancellationWindow: number; // hours before
+      showClassDescription: boolean;
+      showTrainerInfo: boolean;
+      showRemainingSpots: boolean;
+      enableWaitlist: boolean;
+      showWaitlistPosition: boolean;
+      enableAppointmentBooking: boolean;
+      bookableAppointmentTypes: string[];
+      bookableStaffMembers: string[];
+      viewSchedule: boolean;
+      viewAttendanceHistory: boolean;
+    };
+    purchases: {
+      enableMembershipPurchase: boolean;
+      availableMembershipTypes: string[];
+      enablePackagePurchase: boolean;
+      availablePackages: string[];
+      enableRetailPurchase: boolean;
+      availableProductCategories: string[];
+    };
+    engagement: {
+      viewChallenges: boolean;
+      registerForChallenges: boolean;
+      viewLeaderboards: boolean;
+      logChallengeProgress: boolean;
+      accessWorkoutLibrary: boolean;
+      enableReferralProgram: boolean;
+      submitReferrals: boolean;
+    };
+  };
+  
+  // Content Management
+  announcements: MemberPortalAnnouncement[];
+  resources: MemberPortalResource[];
+  faqCategories: MemberPortalFaqCategory[];
+  
+  // Communication
+  emailTemplates: MemberPortalEmailTemplate[];
+  feedbackForms: MemberPortalFeedbackForm[];
+}
+
+export interface MemberPortalAnnouncement {
+  id: string;
+  title: string;
+  content: string;
+  isSticky: boolean;
+  isImportant: boolean;
+  publishDate: string;
+  expiryDate?: string;
+  isPublished: boolean;
+}
+
+export interface MemberPortalResource {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  fileUrl: string;
+  fileType: string;
+  isVisible: boolean;
+  uploadDate: string;
+}
+
+export interface MemberPortalFaqCategory {
+  id: string;
+  name: string;
+  order: number;
+  questions: MemberPortalFaqQuestion[];
+}
+
+export interface MemberPortalFaqQuestion {
+  id: string;
+  question: string;
+  answer: string;
+  order: number;
+}
+
+export interface MemberPortalEmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  body: string;
+  isEnabled: boolean;
+}
+
+export interface MemberPortalFeedbackForm {
+  id: string;
+  name: string;
+  description: string;
+  isEnabled: boolean;
+  recipientEmails: string[];
+  fields: MemberPortalFeedbackField[];
+}
+
+export interface MemberPortalFeedbackField {
+  id: string;
+  type: 'text' | 'textarea' | 'select' | 'radio' | 'checkbox' | 'rating';
+  label: string;
+  required: boolean;
+  options?: string[];
+}
+
+export interface MemberPortalUser {
+  id: string;
+  memberId: string;
+  memberName: string;
+  status: 'Invited' | 'Active' | 'Disabled' | 'Never Logged In';
+  lastLoginDate?: string;
+  inviteSentDate?: string;
 }

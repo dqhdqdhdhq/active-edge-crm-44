@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Settings as SettingsIcon, 
@@ -10,12 +9,14 @@ import {
   Database, 
   Tag,
   Link as LinkIcon,
-  Building
+  Building,
+  UserCircle
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { GymProfileSettings } from "@/components/settings/GymProfileSettings";
 import { PageTitle } from "@/components/ui/page-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MemberPortalSettings } from "@/components/settings/MemberPortalSettings";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("gym-profile");
@@ -75,6 +76,13 @@ const Settings = () => {
               >
                 <Bell size={18} />
                 <span>Notifications</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="member-portal" 
+                className="w-full justify-start gap-3 pl-3 font-medium"
+              >
+                <UserCircle size={18} />
+                <span>Member Portal</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="customization" 
@@ -169,6 +177,9 @@ const Settings = () => {
                   <p className="text-muted-foreground">Notification settings will be implemented soon.</p>
                 </CardContent>
               </Card>
+            </TabsContent>
+            <TabsContent value="member-portal" className="mt-0 data-[state=inactive]:hidden">
+              <MemberPortalSettings />
             </TabsContent>
             <TabsContent value="customization" className="mt-0 data-[state=inactive]:hidden">
               <Card>
