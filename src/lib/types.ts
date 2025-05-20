@@ -1,3 +1,4 @@
+
 export interface Member {
   id: string;
   firstName: string;
@@ -66,6 +67,7 @@ export interface Guest {
   lastName: string;
   email: string;
   phone: string;
+  profileImage?: string;
   visitPurpose: GuestVisitPurpose;
   relatedMemberId?: string;
   waiverSigned: boolean;
@@ -77,7 +79,6 @@ export interface Guest {
   visitHistory: GuestVisit[];
   marketingConsent: boolean;
   notes?: string;
-  profileImage?: string;
 }
 
 export type GuestStatus = 'Checked In' | 'Checked Out' | 'Scheduled';

@@ -42,14 +42,16 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 
-const visitPurposes: GuestVisitPurpose[] = [
-  'Tour',
-  'Guest Pass',
-  'Day Pass',
-  'Event',
-  'Friend of Member',
-  'Potential Member',
-  'Other',
+const visitPurposes = [
+  GuestVisitPurpose.Tour,
+  GuestVisitPurpose.GuestPass,
+  GuestVisitPurpose.DayPass,
+  GuestVisitPurpose.Event,
+  GuestVisitPurpose.FriendOfMember,
+  GuestVisitPurpose.PotentialMember,
+  GuestVisitPurpose.Other,
+  GuestVisitPurpose.Trial,
+  GuestVisitPurpose.MemberGuest
 ];
 
 const guestStatuses: GuestStatus[] = [
@@ -69,9 +71,7 @@ const formSchema = z.object({
     message: 'Please enter a valid email.',
   }).optional(),
   phone: z.string().optional(),
-  visitPurpose: z.enum([
-    'Tour', 'Guest Pass', 'Day Pass', 'Event', 'Friend of Member', 'Potential Member', 'Other'
-  ], {
+  visitPurpose: z.nativeEnum(GuestVisitPurpose, {
     required_error: 'Please select a visit purpose.',
   }),
   relatedMemberId: z.string().optional(),
@@ -105,7 +105,7 @@ export function GuestFormDialog({
   onSave,
   guest,
 }: GuestFormDialogProps) {
-  const form = useForm<FormValues>({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: guest ? {
       firstName: guest.firstName,
@@ -124,7 +124,7 @@ export function GuestFormDialog({
     } : {
       firstName: '',
       lastName: '',
-      visitPurpose: 'Tour',
+      visitPurpose: GuestVisitPurpose.Tour,
       waiverSigned: false,
       checkInDateTime: new Date(),
       status: 'Checked In',
@@ -132,7 +132,7 @@ export function GuestFormDialog({
     },
   });
   
-  const handleSubmit = (values: FormValues) => {
+  const handleSubmit = (values: z.infer<typeof formSchema>) => {
     const guestData: Partial<Guest> = {
       ...values,
       checkInDateTime: values.checkInDateTime.toISOString(),

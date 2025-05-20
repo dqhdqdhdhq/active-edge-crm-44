@@ -53,6 +53,7 @@ export const MemberSearchFilter = ({ onSearch, onFilterChange }: MemberSearchFil
     'Senior',
     'Corporate',
     'Family',
+    'Special Needs'
   ];
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,7 +161,7 @@ export const MemberSearchFilter = ({ onSearch, onFilterChange }: MemberSearchFil
                 <Checkbox
                   checked={tags.includes(tag)}
                   className="mr-2"
-                  onCheckedChange={() => {}} // Empty handler instead of readOnly
+                  onCheckedChange={() => {}} // Empty handler
                 />
                 {tag}
               </Button>

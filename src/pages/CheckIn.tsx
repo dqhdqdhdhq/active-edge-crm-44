@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GuestCheckInForm } from '@/components/check-in/GuestCheckInForm';
 import { BarcodeScanner } from '@/components/check-in/BarcodeScanner';
+import { GuestVisitPurpose } from '@/lib/types';
 
 const CheckInPage = () => {
   const [checkIns, setCheckIns] = useState<CheckIn[]>(recentCheckIns);

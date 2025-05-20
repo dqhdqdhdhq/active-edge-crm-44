@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
@@ -54,6 +55,7 @@ const memberTags: MemberTag[] = [
   'Senior',
   'Corporate',
   'Family',
+  'Special Needs'
 ];
 
 const formSchema = z.object({
@@ -95,6 +97,7 @@ const formSchema = z.object({
     'Senior',
     'Corporate',
     'Family',
+    'Special Needs'
   ])).optional(),
   emergencyContactName: z.string().min(2, {
     message: 'Emergency contact name must be at least 2 characters.',
@@ -445,7 +448,7 @@ export function MemberFormDialog({
                             type="checkbox"
                             id={tag}
                             className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
-                            checked={field.value?.includes(tag)}
+                            checked={field.value?.includes(tag as MemberTag)}
                             onChange={(e) => {
                               if (e.target.checked) {
                                 field.onChange([...(field.value || []), tag]);
@@ -542,4 +545,3 @@ export function MemberFormDialog({
     </Dialog>
   );
 }
-
