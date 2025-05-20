@@ -596,7 +596,7 @@ export const guestVisits: GuestVisit[] = [
     id: '1',
     guestId: '1',
     checkInDateTime: getTimeToday(10, 15),
-    checkOutDateTime: getTimeToday(11, 00),
+    checkOutDateTime: getTimeToday(11, 0), // Fixed: Changed '11, 00' to '11, 0'
     staffId: '1',
     notes: 'Checked in for a complimentary trial pass'
   },
@@ -628,7 +628,7 @@ export const guestVisits: GuestVisit[] = [
     id: '5',
     guestId: '5',
     checkInDateTime: getTimeToday(17, 45),
-    checkOutDateTime: getTimeToday(18, 00),
+    checkOutDateTime: getTimeToday(18, 0), // Fixed: Changed '18, 00' to '18, 0'
     staffId: '3',
     notes: 'Member guest'
   }
