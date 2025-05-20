@@ -1,4 +1,5 @@
-import { CheckIn, Guest, Member, ExpenseCategory, Expense, ExpenseBudget } from '@/lib/types';
+
+import { CheckIn, Guest, Member, ExpenseCategory, Expense, ExpenseBudget, GuestVisit, Note, DashboardStats } from '@/lib/types';
 
 // Mock data for members
 export const members: Member[] = [
@@ -8,19 +9,20 @@ export const members: Member[] = [
     lastName: 'Doe',
     email: 'john.doe@example.com',
     phone: '123-456-7890',
-    address: '123 Main St',
-    membershipType: 'Premium',
-    status: 'Active',
-    startDate: '2023-01-01',
-    endDate: '2024-01-01',
+    profileImage: undefined,
     dateOfBirth: '1990-05-15',
-    gender: 'Male',
-    emergencyContactName: 'Jane Doe',
-    emergencyContactPhone: '098-765-4321',
+    membershipType: 'Standard',
+    membershipStatus: 'Active',
+    membershipStartDate: '2023-01-01',
+    membershipEndDate: '2024-01-01',
+    tags: [],
+    emergencyContact: {
+      name: 'Jane Doe',
+      phone: '098-765-4321',
+      relationship: 'Spouse'
+    },
     notes: 'Regular attendee',
-    checkInHistory: [],
-    paymentHistory: [],
-    classesAttended: [],
+    checkIns: []
   },
   {
     id: 'mem-2',
@@ -28,19 +30,20 @@ export const members: Member[] = [
     lastName: 'Smith',
     email: 'jane.smith@example.com',
     phone: '987-654-3210',
-    address: '456 Elm St',
-    membershipType: 'Basic',
-    status: 'Inactive',
-    startDate: '2022-12-15',
-    endDate: '2023-12-15',
+    profileImage: undefined,
     dateOfBirth: '1985-10-20',
-    gender: 'Female',
-    emergencyContactName: 'Mike Smith',
-    emergencyContactPhone: '111-222-3333',
+    membershipType: 'Standard',
+    membershipStatus: 'Inactive',
+    membershipStartDate: '2022-12-15',
+    membershipEndDate: '2023-12-15',
+    tags: [],
+    emergencyContact: {
+      name: 'Mike Smith',
+      phone: '111-222-3333',
+      relationship: 'Husband'
+    },
     notes: 'Interested in yoga classes',
-    checkInHistory: [],
-    paymentHistory: [],
-    classesAttended: [],
+    checkIns: []
   },
   {
     id: 'mem-3',
@@ -48,19 +51,20 @@ export const members: Member[] = [
     lastName: 'Johnson',
     email: 'alice.johnson@example.com',
     phone: '555-123-4567',
-    address: '789 Oak St',
-    membershipType: 'Premium',
-    status: 'Active',
-    startDate: '2023-03-01',
-    endDate: '2024-03-01',
+    profileImage: undefined,
     dateOfBirth: '1992-07-08',
-    gender: 'Female',
-    emergencyContactName: 'Bob Johnson',
-    emergencyContactPhone: '444-555-6666',
+    membershipType: 'Premium',
+    membershipStatus: 'Active',
+    membershipStartDate: '2023-03-01',
+    membershipEndDate: '2024-03-01',
+    tags: [],
+    emergencyContact: {
+      name: 'Bob Johnson',
+      phone: '444-555-6666',
+      relationship: 'Brother'
+    },
     notes: 'Prefers morning workouts',
-    checkInHistory: [],
-    paymentHistory: [],
-    classesAttended: [],
+    checkIns: []
   },
   {
     id: 'mem-4',
@@ -68,19 +72,20 @@ export const members: Member[] = [
     lastName: 'Williams',
     email: 'bob.williams@example.com',
     phone: '777-888-9999',
-    address: '101 Pine St',
-    membershipType: 'Basic',
-    status: 'Active',
-    startDate: '2023-04-10',
-    endDate: '2024-04-10',
+    profileImage: undefined,
     dateOfBirth: '1988-12-25',
-    gender: 'Male',
-    emergencyContactName: 'Carol Williams',
-    emergencyContactPhone: '777-111-2222',
+    membershipType: 'Standard',
+    membershipStatus: 'Active',
+    membershipStartDate: '2023-04-10',
+    membershipEndDate: '2024-04-10',
+    tags: [],
+    emergencyContact: {
+      name: 'Carol Williams',
+      phone: '777-111-2222',
+      relationship: 'Wife'
+    },
     notes: 'Interested in weightlifting',
-    checkInHistory: [],
-    paymentHistory: [],
-    classesAttended: [],
+    checkIns: []
   },
 ];
 
@@ -111,14 +116,17 @@ export const guests: Guest[] = [
     lastName: 'Brown',
     email: 'charlie.brown@example.com',
     phone: '333-444-5555',
+    visitPurpose: 'Trial',
     relatedMemberId: 'mem-1',
     waiverSigned: true,
     checkInDateTime: new Date().toISOString(),
-    visitPurpose: 'Trial',
+    checkOutDateTime: undefined,
     status: 'Checked In',
     convertedToMember: false,
+    referralSource: undefined,
     visitHistory: [],
-		marketingConsent: false
+    marketingConsent: false,
+    notes: undefined
   },
   {
     id: 'guest-2',
@@ -126,14 +134,17 @@ export const guests: Guest[] = [
     lastName: 'Van Pelt',
     email: 'lucy.vanpelt@example.com',
     phone: '444-555-6666',
+    visitPurpose: 'Tour',
     relatedMemberId: 'mem-2',
     waiverSigned: true,
     checkInDateTime: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
-    visitPurpose: 'Tour',
+    checkOutDateTime: undefined,
     status: 'Checked In',
     convertedToMember: false,
+    referralSource: undefined,
     visitHistory: [],
-		marketingConsent: false
+    marketingConsent: false,
+    notes: undefined
   }
 ];
 
@@ -296,3 +307,158 @@ export const expenseBudgets: ExpenseBudget[] = [
     periodStartDate: new Date(2025, 0, 1).toISOString(),
   },
 ];
+
+// Add missing exports needed by other pages
+export const gymClasses = [
+  {
+    id: 'class-1',
+    name: 'Morning Yoga',
+    type: 'Yoga',
+    description: 'Start your day with rejuvenating yoga',
+    trainerId: 'trainer-1',
+    room: 'Yoga Studio',
+    startTime: '07:00',
+    endTime: '08:00',
+    date: new Date().toISOString(),
+    capacity: 15,
+    attendees: ['mem-1', 'mem-3']
+  },
+  {
+    id: 'class-2',
+    name: 'HIIT Workout',
+    type: 'HIIT',
+    description: 'High intensity interval training',
+    trainerId: 'trainer-2',
+    room: 'Main Floor',
+    startTime: '18:00',
+    endTime: '19:00',
+    date: new Date().toISOString(),
+    capacity: 20,
+    attendees: ['mem-2', 'mem-4']
+  }
+];
+
+export const trainers = [
+  {
+    id: 'trainer-1',
+    firstName: 'Mike',
+    lastName: 'Johnson',
+    email: 'mike@example.com',
+    phone: '555-123-7890',
+    specialties: ['Yoga', 'Pilates'],
+    certifications: ['Certified Yoga Instructor'],
+    bio: 'Experienced yoga instructor with 5+ years of teaching',
+    availability: [
+      {
+        day: 'Monday',
+        startTime: '07:00',
+        endTime: '15:00'
+      },
+      {
+        day: 'Wednesday',
+        startTime: '07:00',
+        endTime: '15:00'
+      },
+      {
+        day: 'Friday',
+        startTime: '07:00',
+        endTime: '15:00'
+      }
+    ],
+    assignedClasses: ['class-1'],
+    assignedMembers: ['mem-1', 'mem-3']
+  },
+  {
+    id: 'trainer-2',
+    firstName: 'Sarah',
+    lastName: 'Thompson',
+    email: 'sarah@example.com',
+    phone: '555-987-6543',
+    specialties: ['HIIT', 'Strength Training'],
+    certifications: ['NASM Certified Personal Trainer'],
+    bio: 'Fitness expert specializing in high intensity workouts',
+    availability: [
+      {
+        day: 'Tuesday',
+        startTime: '12:00',
+        endTime: '20:00'
+      },
+      {
+        day: 'Thursday',
+        startTime: '12:00',
+        endTime: '20:00'
+      },
+      {
+        day: 'Saturday',
+        startTime: '09:00',
+        endTime: '15:00'
+      }
+    ],
+    assignedClasses: ['class-2'],
+    assignedMembers: ['mem-2', 'mem-4']
+  }
+];
+
+export const notes: Note[] = [
+  {
+    id: 'note-1',
+    category: 'Member Notes',
+    title: 'New workout plan for John',
+    content: 'Created custom strength training program for John Doe',
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    createdBy: 'trainer-1',
+    relatedTo: {
+      type: 'Member',
+      id: 'mem-1'
+    }
+  },
+  {
+    id: 'note-2',
+    category: 'Training Logs',
+    title: 'HIIT Class Adjustments',
+    content: 'Modified exercises for beginners in today\'s class',
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+    createdBy: 'trainer-2',
+    relatedTo: {
+      type: 'Class',
+      id: 'class-2'
+    }
+  }
+];
+
+export const dashboardStats: DashboardStats = {
+  todayCheckIns: 15,
+  activeMembers: 87,
+  expiringMemberships: 4,
+  upcomingClasses: 8,
+  newMembers: 6
+};
+
+// Add mock data functions for the Reports page
+export const generateMembershipDistributionData = () => {
+  return [
+    { name: 'Standard', value: 45 },
+    { name: 'Premium', value: 30 },
+    { name: 'VIP', value: 10 },
+    { name: 'Student', value: 25 },
+    { name: 'Senior', value: 15 }
+  ];
+};
+
+export const generateMonthlyCheckInData = () => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return months.map(month => ({
+    name: month,
+    checkIns: Math.floor(Math.random() * 500) + 300
+  }));
+};
+
+export const generateWeeklyClassAttendanceData = () => {
+  return [
+    { name: 'Yoga', attendance: 85 },
+    { name: 'HIIT', attendance: 75 },
+    { name: 'Spin', attendance: 90 },
+    { name: 'Zumba', attendance: 65 },
+    { name: 'CrossFit', attendance: 80 }
+  ];
+};
