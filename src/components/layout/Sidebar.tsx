@@ -9,7 +9,8 @@ import {
   PieChart,
   Settings,
   Menu,
-  X
+  X,
+  Receipt
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -106,6 +107,12 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
           label="Check-In" 
           to="/check-in" 
           active={location.pathname.startsWith('/check-in')} 
+        />
+        <SidebarItem 
+          icon={Receipt} 
+          label="Expenses" 
+          to="/expenses" 
+          active={location.pathname.startsWith('/expenses')} 
         />
         <SidebarItem 
           icon={PieChart} 

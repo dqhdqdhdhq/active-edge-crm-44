@@ -129,3 +129,54 @@ export interface DashboardStats {
   upcomingClasses: number;
   newMembers: number;
 }
+
+// Expense-related types
+export type PaymentMethod = 'Credit Card' | 'Bank Transfer' | 'Cash' | 'Check' | 'Other';
+export type RecurrenceFrequency = 'Daily' | 'Weekly' | 'Bi-Weekly' | 'Monthly' | 'Quarterly' | 'Annually';
+export type BudgetPeriod = 'monthly' | 'quarterly' | 'annually';
+
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+  color: string;
+  parentCategoryId?: string;
+  budget?: {
+    amount: number;
+    period: BudgetPeriod;
+  };
+}
+
+export interface Receipt {
+  id: string;
+  expenseId: string;
+  fileName: string;
+  fileUrl: string;
+  fileType: string;
+  uploadedAt: string;
+}
+
+export interface Expense {
+  id: string;
+  date: string; // ISO date string
+  categoryId: string;
+  amount: number;
+  payee: string;
+  description: string;
+  paymentMethod: PaymentMethod;
+  receipts: Receipt[];
+  isRecurring: boolean;
+  recurrenceFrequency?: RecurrenceFrequency;
+  recurrenceStartDate?: string;
+  recurrenceEndDate?: string;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExpenseBudget {
+  id: string;
+  categoryId: string;
+  amount: number;
+  periodType: BudgetPeriod;
+  periodStartDate: string;
+}

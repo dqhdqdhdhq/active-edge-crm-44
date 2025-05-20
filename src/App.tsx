@@ -13,6 +13,7 @@ import Trainers from "./pages/Trainers";
 import CheckIn from "./pages/CheckIn";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Expenses from "./pages/Expenses";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="classes" element={<Classes />} />
             <Route path="trainers" element={<Trainers />} />
             <Route path="check-in" element={<CheckIn />} />
+            <Route path="expenses" element={<Expenses />} />
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
