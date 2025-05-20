@@ -1,3 +1,4 @@
+
 export interface Member {
   id: string;
   firstName: string;
@@ -71,16 +72,20 @@ export interface Expense {
   amount: number;
   payee: string;
   description: string;
-  paymentMethod: string;
+  paymentMethod: PaymentMethod;
   receipts: ExpenseReceipt[];
   isRecurring: boolean;
-  recurrenceFrequency?: 'Daily' | 'Weekly' | 'Monthly' | 'Quarterly' | 'Yearly';
+  recurrenceFrequency?: RecurrenceFrequency;
   recurrenceStartDate?: string;
   recurrenceEndDate?: string;
   tags?: string[];
   createdAt: string;
   updatedAt: string;
 }
+
+export type PaymentMethod = 'Credit Card' | 'Cash' | 'Check' | 'Bank Transfer' | 'Other';
+
+export type RecurrenceFrequency = 'Daily' | 'Weekly' | 'Monthly' | 'Quarterly' | 'Yearly';
 
 export interface ExpenseReceipt {
   id: string;
@@ -130,6 +135,8 @@ export enum ClassType {
   Strength = 'Strength',
   CrossFit = 'CrossFit',
   Cardio = 'Cardio',
+  Boxing = 'Boxing',
+  Spin = 'Spin',
   Other = 'Other'
 }
 
@@ -141,6 +148,11 @@ export enum Room {
   PoolArea = 'Pool Area',
   PersonalTraining = 'Personal Training',
   OutdoorSpace = 'Outdoor Space',
+  StudioA = 'Studio A',
+  StudioB = 'Studio B',
+  SpinRoom = 'Spin Room',
+  Pool = 'Pool',
+  Outdoor = 'Outdoor',
   Other = 'Other'
 }
 

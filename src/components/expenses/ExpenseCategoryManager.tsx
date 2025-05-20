@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { ChromePicker } from 'react-color';
 import { Edit, Plus, Save, Trash, X } from 'lucide-react';
@@ -238,7 +237,7 @@ export function ExpenseCategoryManager({
                         ...newCategory,
                         budget: {
                           amount: newCategory.budget?.amount || 0,
-                          period: value as 'monthly' | 'quarterly' | 'annually',
+                          period: value as 'monthly' | 'quarterly' | 'yearly',
                         },
                       })
                     }
@@ -249,7 +248,7 @@ export function ExpenseCategoryManager({
                     <SelectContent>
                       <SelectItem value="monthly">Monthly</SelectItem>
                       <SelectItem value="quarterly">Quarterly</SelectItem>
-                      <SelectItem value="annually">Annually</SelectItem>
+                      <SelectItem value="yearly">Yearly</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -355,7 +354,7 @@ export function ExpenseCategoryManager({
                           ...editingCategory,
                           budget: {
                             amount: editingCategory.budget?.amount || 0,
-                            period: value as 'monthly' | 'quarterly' | 'annually',
+                            period: value as 'monthly' | 'quarterly' | 'yearly',
                           },
                         })
                       }
@@ -366,7 +365,7 @@ export function ExpenseCategoryManager({
                       <SelectContent>
                         <SelectItem value="monthly">Monthly</SelectItem>
                         <SelectItem value="quarterly">Quarterly</SelectItem>
-                        <SelectItem value="annually">Annually</SelectItem>
+                        <SelectItem value="yearly">Yearly</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
