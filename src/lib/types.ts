@@ -252,21 +252,18 @@ export interface TrainerPerformance {
 }
 
 export interface MemberPortalConfig {
-  // Global Portal Configuration
   portalEnabled: boolean;
   portalUrl: string;
   autoInviteNewMembers: boolean;
   
-  // Branding & Appearance
   logo?: string;
   favicon?: string;
-  colorScheme: 'light' | 'dark' | 'primary' | 'custom';
+  colorScheme: "light" | "dark" | "primary" | "custom";
   primaryColor?: string;
   secondaryColor?: string;
   welcomeMessage: string;
   footerText: string;
   
-  // Feature Configuration
   features: {
     profile: {
       viewProfile: boolean;
@@ -316,14 +313,62 @@ export interface MemberPortalConfig {
     };
   };
   
-  // Content Management
-  announcements: MemberPortalAnnouncement[];
-  resources: MemberPortalResource[];
-  faqCategories: MemberPortalFaqCategory[];
+  announcements: Array<{
+    id: string;
+    title: string;
+    content: string;
+    isSticky: boolean;
+    isPublished: boolean;
+    publishDate?: string;
+    expiryDate?: string;
+    createdAt: string;
+  }>;
   
-  // Communication
-  emailTemplates: MemberPortalEmailTemplate[];
-  feedbackForms: MemberPortalFeedbackForm[];
+  resources: Array<{
+    id: string;
+    name: string;
+    description?: string;
+    category: string;
+    fileUrl: string;
+    fileType: string;
+    isPublic: boolean;
+    createdAt: string;
+  }>;
+  
+  faqCategories: Array<{
+    id: string;
+    name: string;
+    order: number;
+    faqs: Array<{
+      id: string;
+      question: string;
+      answer: string;
+      order: number;
+    }>;
+  }>;
+  
+  emailTemplates: Array<{
+    id: string;
+    name: string;
+    subject: string;
+    body: string;
+    isEnabled: boolean;
+  }>;
+  
+  feedbackForms: Array<{
+    id: string;
+    name: string;
+    description?: string;
+    isEnabled: boolean;
+    fields: Array<{
+      id: string;
+      type: "text" | "textarea" | "select" | "radio" | "checkbox" | "rating";
+      label: string;
+      placeholder?: string;
+      isRequired: boolean;
+      options?: string[];
+    }>;
+  }>;
 }
 
 export interface MemberPortalAnnouncement {

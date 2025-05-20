@@ -10,7 +10,8 @@ import {
   Settings,
   Menu,
   X,
-  Receipt
+  Receipt,
+  UserCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -119,6 +120,12 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
           label="Reports" 
           to="/reports" 
           active={location.pathname.startsWith('/reports')} 
+        />
+        <SidebarItem 
+          icon={UserCircle} 
+          label="Guests" 
+          to="/guests" 
+          active={location.pathname.startsWith('/guests')} 
         />
       </div>
 
