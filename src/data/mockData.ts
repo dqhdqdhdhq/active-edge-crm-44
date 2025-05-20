@@ -1,5 +1,5 @@
 
-import { CheckIn, Guest, Member, ExpenseCategory, Expense, ExpenseBudget, GuestVisit, Note, DashboardStats } from '@/lib/types';
+import { CheckIn, Guest, Member, ExpenseCategory, Expense, ExpenseBudget, GuestVisit, Note, DashboardStats, ClassType, Room, GymClass, Trainer } from '@/lib/types';
 
 // Mock data for members
 export const members: Member[] = [
@@ -309,14 +309,14 @@ export const expenseBudgets: ExpenseBudget[] = [
 ];
 
 // Add missing exports needed by other pages
-export const gymClasses = [
+export const gymClasses: GymClass[] = [
   {
     id: 'class-1',
     name: 'Morning Yoga',
-    type: 'Yoga',
+    type: ClassType.Yoga,
     description: 'Start your day with rejuvenating yoga',
     trainerId: 'trainer-1',
-    room: 'Yoga Studio',
+    room: Room.YogaStudio,
     startTime: '07:00',
     endTime: '08:00',
     date: new Date().toISOString(),
@@ -326,10 +326,10 @@ export const gymClasses = [
   {
     id: 'class-2',
     name: 'HIIT Workout',
-    type: 'HIIT',
+    type: ClassType.HIIT,
     description: 'High intensity interval training',
     trainerId: 'trainer-2',
-    room: 'Main Floor',
+    room: Room.MainFloor,
     startTime: '18:00',
     endTime: '19:00',
     date: new Date().toISOString(),
@@ -338,7 +338,7 @@ export const gymClasses = [
   }
 ];
 
-export const trainers = [
+export const trainers: Trainer[] = [
   {
     id: 'trainer-1',
     firstName: 'Mike',
@@ -348,6 +348,7 @@ export const trainers = [
     specialties: ['Yoga', 'Pilates'],
     certifications: ['Certified Yoga Instructor'],
     bio: 'Experienced yoga instructor with 5+ years of teaching',
+    profileImage: undefined,
     availability: [
       {
         day: 'Monday',
@@ -377,6 +378,7 @@ export const trainers = [
     specialties: ['HIIT', 'Strength Training'],
     certifications: ['NASM Certified Personal Trainer'],
     bio: 'Fitness expert specializing in high intensity workouts',
+    profileImage: undefined,
     availability: [
       {
         day: 'Tuesday',

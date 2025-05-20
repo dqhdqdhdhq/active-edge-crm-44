@@ -1,9 +1,3 @@
-export type MembershipType = 'Standard' | 'Premium' | 'VIP' | 'Student' | 'Senior' | 'Family' | 'Corporate';
-export type MembershipStatus = 'Active' | 'Inactive' | 'Expired' | 'Frozen' | 'Pending';
-export type MemberTag = 'VIP' | 'Personal Training' | 'New Member' | 'Special Needs' | 'Prospect' | 'Corporate';
-export type ClassType = 'Yoga' | 'Spin' | 'HIIT' | 'Pilates' | 'Zumba' | 'Boxing' | 'CrossFit' | 'Strength' | 'Cardio';
-export type Room = 'Studio A' | 'Studio B' | 'Main Floor' | 'Spin Room' | 'Yoga Studio' | 'Pool' | 'Outdoor';
-
 export interface Member {
   id: string;
   firstName: string;
@@ -12,12 +6,12 @@ export interface Member {
   phone: string;
   profileImage?: string;
   dateOfBirth: string;
-  membershipType: MembershipType;
-  membershipStatus: MembershipStatus;
+  membershipType: string;
+  membershipStatus: string;
   membershipStartDate: string;
   membershipEndDate: string;
-  tags: MemberTag[];
-  emergencyContact?: {
+  tags: string[];
+  emergencyContact: {
     name: string;
     phone: string;
     relationship: string;
@@ -26,26 +20,29 @@ export interface Member {
   checkIns: CheckIn[];
 }
 
-export type GuestVisitPurpose = 'Trial' | 'Day Pass' | 'Tour' | 'Event' | 'Member Guest';
-export type GuestStatus = 'Checked In' | 'Checked Out' | 'Scheduled';
+export interface CheckIn {
+  id: string;
+  memberId: string;
+  dateTime: string;
+}
 
 export interface Guest {
   id: string;
   firstName: string;
   lastName: string;
-  email?: string;
-  phone?: string;
-  visitPurpose: GuestVisitPurpose;
+  email: string;
+  phone: string;
+  visitPurpose: string;
   relatedMemberId?: string;
   waiverSigned: boolean;
   checkInDateTime: string;
   checkOutDateTime?: string;
-  status: GuestStatus;
-  notes?: string;
+  status: 'Checked In' | 'Checked Out';
   convertedToMember: boolean;
   referralSource?: string;
   visitHistory: GuestVisit[];
   marketingConsent: boolean;
+  notes?: string;
 }
 
 export interface GuestVisit {
@@ -53,70 +50,63 @@ export interface GuestVisit {
   guestId: string;
   checkInDateTime: string;
   checkOutDateTime?: string;
-  visitPurpose: GuestVisitPurpose;
+  purpose: string;
   notes?: string;
-  staffId?: string;
 }
 
-export interface TrainerPerformance {
-  classesCount: number;
-  attendanceRate: number;
-  clientRetentionRate: number;
-  ptSessionsCount: number;
-  memberFeedback: number;
-  revenueGenerated: number;
-  rankLastMonth?: number;
-  rankChange?: number;
-}
-
-export interface Trainer {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  profileImage?: string;
-  specialties: string[];
-  certifications: string[];
-  bio: string;
-  availability: {
-    day: string;
-    startTime: string;
-    endTime: string;
-  }[];
-  assignedClasses: string[];
-  assignedMembers: string[];
-  performance?: TrainerPerformance;
-}
-
-export interface GymClass {
+export interface ExpenseCategory {
   id: string;
   name: string;
-  type: ClassType;
-  description: string;
-  trainerId: string;
-  room: Room;
-  startTime: string;
-  endTime: string;
-  date: string;
-  capacity: number;
-  attendees: string[];
+  color: string;
+  budget?: {
+    amount: number;
+    period: 'monthly' | 'quarterly' | 'yearly';
+  };
 }
 
-export interface CheckIn {
+export interface Expense {
   id: string;
-  memberId: string;
-  dateTime: string;
+  date: string;
+  categoryId: string;
+  amount: number;
+  payee: string;
+  description: string;
+  paymentMethod: string;
+  receipts: ExpenseReceipt[];
+  isRecurring: boolean;
+  recurrenceFrequency?: 'Daily' | 'Weekly' | 'Monthly' | 'Quarterly' | 'Yearly';
+  recurrenceStartDate?: string;
+  recurrenceEndDate?: string;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExpenseReceipt {
+  id: string;
+  expenseId: string;
+  fileName: string;
+  fileUrl: string;
+  fileType: string;
+  uploadedAt: string;
+}
+
+export interface ExpenseBudget {
+  id: string;
+  categoryId: string;
+  amount: number;
+  periodType: 'monthly' | 'quarterly' | 'yearly';
+  periodStartDate: string;
 }
 
 export interface Note {
   id: string;
-  category: 'Member Notes' | 'Training Logs' | 'Incidents' | 'Maintenance' | 'Communication';
+  category: string;
   title: string;
   content: string;
   createdAt: string;
   createdBy: string;
-  relatedTo?: {
+  relatedTo: {
     type: 'Member' | 'Class' | 'Trainer';
     id: string;
   };
@@ -130,53 +120,60 @@ export interface DashboardStats {
   newMembers: number;
 }
 
-// Expense-related types
-export type PaymentMethod = 'Credit Card' | 'Bank Transfer' | 'Cash' | 'Check' | 'Other';
-export type RecurrenceFrequency = 'Daily' | 'Weekly' | 'Bi-Weekly' | 'Monthly' | 'Quarterly' | 'Annually';
-export type BudgetPeriod = 'monthly' | 'quarterly' | 'annually';
+// Add these specific enums for ClassType and Room
+export enum ClassType {
+  Yoga = 'Yoga',
+  HIIT = 'HIIT',
+  Pilates = 'Pilates',
+  Zumba = 'Zumba',
+  Cycling = 'Cycling',
+  Strength = 'Strength',
+  CrossFit = 'CrossFit',
+  Cardio = 'Cardio',
+  Other = 'Other'
+}
 
-export interface ExpenseCategory {
+export enum Room {
+  YogaStudio = 'Yoga Studio',
+  MainFloor = 'Main Floor',
+  CyclingRoom = 'Cycling Room',
+  GroupFitness = 'Group Fitness',
+  PoolArea = 'Pool Area',
+  PersonalTraining = 'Personal Training',
+  OutdoorSpace = 'Outdoor Space',
+  Other = 'Other'
+}
+
+// Update GymClass to use these enums
+export interface GymClass {
   id: string;
   name: string;
-  color: string;
-  parentCategoryId?: string;
-  budget?: {
-    amount: number;
-    period: BudgetPeriod;
-  };
-}
-
-export interface Receipt {
-  id: string;
-  expenseId: string;
-  fileName: string;
-  fileUrl: string;
-  fileType: string;
-  uploadedAt: string;
-}
-
-export interface Expense {
-  id: string;
-  date: string; // ISO date string
-  categoryId: string;
-  amount: number;
-  payee: string;
+  type: ClassType;  // Use the enum
   description: string;
-  paymentMethod: PaymentMethod;
-  receipts: Receipt[];
-  isRecurring: boolean;
-  recurrenceFrequency?: RecurrenceFrequency;
-  recurrenceStartDate?: string;
-  recurrenceEndDate?: string;
-  tags?: string[];
-  createdAt: string;
-  updatedAt: string;
+  trainerId: string;
+  room: Room;       // Use the enum
+  startTime: string;
+  endTime: string;
+  date: string;
+  capacity: number;
+  attendees: string[];
 }
 
-export interface ExpenseBudget {
+export interface Trainer {
   id: string;
-  categoryId: string;
-  amount: number;
-  periodType: BudgetPeriod;
-  periodStartDate: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  specialties: string[];
+  certifications: string[];
+  bio: string;
+  profileImage?: string;
+  availability: {
+    day: string;
+    startTime: string;
+    endTime: string;
+  }[];
+  assignedClasses: string[];
+  assignedMembers: string[];
 }

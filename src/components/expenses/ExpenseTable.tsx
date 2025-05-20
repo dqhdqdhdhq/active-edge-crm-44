@@ -1,5 +1,7 @@
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { format } from 'date-fns';
+import { MoreHorizontal, Receipt, Trash, Edit, Eye } from 'lucide-react';
 import {
   flexRender,
   getCoreRowModel,
@@ -11,9 +13,18 @@ import {
   type ColumnFiltersState,
   type SortingState,
 } from '@tanstack/react-table';
-import { format } from 'date-fns';
-import { Calendar, ChevronDown, MoreHorizontal, Receipt, RefreshCcw } from 'lucide-react';
 
+import { Expense, ExpenseCategory } from '@/lib/types';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Table,
   TableBody,
@@ -22,54 +33,36 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Expense, ExpenseCategory } from '@/lib/types';
 import { ExpenseFilters } from './ExpenseFilters';
+import { Badge } from '@/components/ui/badge';
 
 interface ExpenseTableProps {
   expenses: Expense[];
   categories: ExpenseCategory[];
   onEdit: (expense: Expense) => void;
-  onDelete: (expenseId: string) => void;
+  onDelete: (id: string) => void;
   onView: (expense: Expense) => void;
 }
 
-export function ExpenseTable({ 
-  expenses, 
-  categories,
-  onEdit,
-  onDelete,
-  onView
-}: ExpenseTableProps) {
+export function ExpenseTable({ expenses, categories, onEdit, onDelete, onView }: ExpenseTableProps) {
   const [sorting, setSorting] = useState<SortingState>([{ id: 'date', desc: true }]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
 
-  const getCategoryName = (categoryId: string) => {
-    return categories.find(c => c.id === categoryId)?.name || 'Uncategorized';
-  };
-
-  const getCategoryColor = (categoryId: string) => {
-    return categories.find(c => c.id === categoryId)?.color || '#64748b';
+  const categoryMap = useMemo(() => {
+    return categories.reduce((acc, category) => {
+      acc[category.id] = category;
+      return acc;
+    }, {} as Record<string, ExpenseCategory>);
+  }, [categories]);
+  
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
   };
 
   const columns: ColumnDef<Expense>[] = [
@@ -78,7 +71,7 @@ export function ExpenseTable({
       header: ({ table }) => (
         <Checkbox
           checked={
-            table.getIsAllPageRowsSelected() ||
+            table.getIsAllPageRowsSelected() || 
             (table.getIsSomePageRowsSelected() && "indeterminate")
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
@@ -98,50 +91,70 @@ export function ExpenseTable({
     {
       accessorKey: 'date',
       header: 'Date',
-      cell: ({ row }) => {
-        const date = new Date(row.getValue('date'));
-        return <div className="font-medium">{format(date, 'MMM dd, yyyy')}</div>;
+      cell: ({ row }) => format(new Date(row.getValue('date')), 'MMM d, yyyy'),
+      filterFn: (row, id, filterValue) => {
+        const [from, to] = filterValue as string[];
+        const cellDate = new Date(row.getValue(id));
+        const fromDate = from ? new Date(from) : null;
+        const toDate = to ? new Date(to) : null;
+        
+        if (fromDate && toDate) {
+          return cellDate >= fromDate && cellDate <= toDate;
+        } else if (fromDate) {
+          return cellDate >= fromDate;
+        } else if (toDate) {
+          return cellDate <= toDate;
+        }
+        return true;
       },
-      enableColumnFilter: true,
     },
     {
       accessorKey: 'categoryId',
       header: 'Category',
       cell: ({ row }) => {
         const categoryId = row.getValue('categoryId') as string;
-        const categoryName = getCategoryName(categoryId);
-        const categoryColor = getCategoryColor(categoryId);
+        const category = categoryMap[categoryId];
+        
+        if (!category) return 'Uncategorized';
         
         return (
-          <div className="flex items-center gap-2">
-            <div 
-              className="w-3 h-3 rounded-full" 
-              style={{ backgroundColor: categoryColor }} 
-            />
-            {categoryName}
-          </div>
+          <Badge 
+            style={{ 
+              backgroundColor: category.color,
+              color: 'white' 
+            }}
+          >
+            {category.name}
+          </Badge>
         );
       },
-      filterFn: (row, id, value) => {
-        return value.includes(row.getValue(id));
+      filterFn: (row, id, filterValue) => {
+        const categoryIds = filterValue as string[];
+        if (!categoryIds || categoryIds.length === 0) return true;
+        return categoryIds.includes(row.getValue(id) as string);
       },
     },
     {
       accessorKey: 'amount',
       header: 'Amount',
-      cell: ({ row }) => {
-        const amount = parseFloat(row.getValue('amount'));
-        const formatted = new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-        }).format(amount);
+      cell: ({ row }) => formatCurrency(row.getValue('amount')),
+      filterFn: (row, id, filterValue) => {
+        const [min, max] = filterValue as [number | undefined, number | undefined];
+        const amount = row.getValue(id) as number;
         
-        return <div className="font-medium">{formatted}</div>;
+        if (min !== undefined && max !== undefined) {
+          return amount >= min && amount <= max;
+        } else if (min !== undefined) {
+          return amount >= min;
+        } else if (max !== undefined) {
+          return amount <= max;
+        }
+        return true;
       },
     },
     {
       accessorKey: 'payee',
-      header: 'Payee/Vendor',
+      header: 'Payee',
       cell: ({ row }) => row.getValue('payee') || '-',
     },
     {
@@ -149,241 +162,167 @@ export function ExpenseTable({
       header: 'Description',
       cell: ({ row }) => {
         const description = row.getValue('description') as string;
-        return (
-          <div className="max-w-[300px] truncate" title={description}>
-            {description}
-          </div>
-        );
+        return description?.length > 30 
+          ? `${description.substring(0, 30)}...` 
+          : description || '-';
       },
     },
     {
       accessorKey: 'paymentMethod',
       header: 'Payment Method',
-      cell: ({ row }) => row.getValue('paymentMethod'),
+      cell: ({ row }) => row.getValue('paymentMethod') || '-',
     },
     {
       accessorKey: 'receipts',
-      header: 'Receipt',
+      header: 'Receipts',
       cell: ({ row }) => {
-        const receipts = row.original.receipts;
-        return receipts.length > 0 ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              onView(row.original);
-            }}
+        const receipts = row.getValue('receipts') as any[];
+        return receipts?.length ? (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => onView(row.original)}
           >
-            <Receipt className="h-4 w-4" />
-            {receipts.length > 1 && (
-              <Badge variant="secondary" className="ml-1 text-xs">
-                {receipts.length}
-              </Badge>
-            )}
+            <Receipt className="h-4 w-4 mr-1" />
+            {receipts.length}
           </Button>
         ) : (
-          <span className="text-muted-foreground">-</span>
-        );
-      },
-      enableSorting: false,
-    },
-    {
-      accessorKey: 'isRecurring',
-      header: 'Recurring',
-      cell: ({ row }) => {
-        const isRecurring = row.getValue('isRecurring');
-        return isRecurring ? (
-          <div className="flex items-center">
-            <RefreshCcw className="h-4 w-4 mr-1 text-primary" />
-            <span>Yes</span>
-          </div>
-        ) : (
-          <span>No</span>
+          '-'
         );
       },
     },
     {
       id: 'actions',
-      cell: ({ row }) => {
-        const expense = row.original;
-        
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onView(expense)}>
-                View Details
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEdit(expense)}>
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
-                onClick={() => onDelete(expense.id)}
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
+      enableHiding: false,
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => onEdit(row.original)}>
+              <Edit className="mr-2 h-4 w-4" />
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onView(row.original)}>
+              <Eye className="mr-2 h-4 w-4" />
+              View Receipts
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => onDelete(row.original.id)}
+              className="text-destructive focus:text-destructive"
+            >
+              <Trash className="mr-2 h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
     },
   ];
 
   const table = useReactTable({
     data: expenses,
     columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       rowSelection,
-      globalFilter,
     },
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
   });
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <CardTitle>Expenses</CardTitle>
-            <CardDescription>
-              Manage your gym expenses
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Input
-                placeholder="Search expenses..."
-                value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)}
-                className="w-full sm:w-[250px]"
-              />
-            </div>
-            <Button 
-              variant="outline" 
-              size="icon"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Calendar className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-      
-      {showFilters && (
-        <ExpenseFilters 
-          table={table} 
-          categories={categories}
-        />
-      )}
-      
-      <CardContent>
-        <div className="rounded-md border overflow-hidden">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder ? null : (
-                        <div
-                          className={
-                            header.column.getCanSort()
-                              ? "flex items-center gap-1 cursor-pointer select-none"
-                              : ""
-                          }
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                          {{
-                            asc: <ChevronDown className="h-4 w-4 rotate-180" />,
-                            desc: <ChevronDown className="h-4 w-4" />,
-                          }[header.column.getIsSorted() as string] ?? null}
-                        </div>
-                      )}
-                    </TableHead>
+    <div className="space-y-4">
+      <ExpenseFilters table={table} categories={categories} />
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
                   ))}
                 </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    onClick={() => onView(row.original)}
-                    className="cursor-pointer"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    No expenses found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        
-        <div className="flex items-center justify-between space-x-2 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  No expenses found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+          <div>
             {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
+            {table.getFilteredRowModel().rows.length} row(s) selected
           </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
+          <div>
+            Total: {formatCurrency(
+              table.getFilteredRowModel().rows.reduce(
+                (total, row) => total + (row.original.amount || 0), 
+                0
+              )
+            )}
           </div>
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
