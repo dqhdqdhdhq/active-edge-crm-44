@@ -1,5 +1,4 @@
-
-import { CheckIn, Guest, Member, ExpenseCategory, Expense, ExpenseBudget, GuestVisit, Note, DashboardStats, ClassType, Room, GymClass, Trainer } from '@/lib/types';
+import { CheckIn, Guest, Member, ExpenseCategory, Expense, ExpenseBudget, GuestVisit, Note, DashboardStats, ClassType, Room, GymClass, Trainer, MembershipType, MembershipStatus, GuestVisitPurpose, GuestStatus } from '@/lib/types';
 
 // Mock data for members
 export const members: Member[] = [
@@ -11,8 +10,8 @@ export const members: Member[] = [
     phone: '123-456-7890',
     profileImage: undefined,
     dateOfBirth: '1990-05-15',
-    membershipType: 'Standard',
-    membershipStatus: 'Active',
+    membershipType: MembershipType.Standard,
+    membershipStatus: MembershipStatus.Active,
     membershipStartDate: '2023-01-01',
     membershipEndDate: '2024-01-01',
     tags: [],
@@ -32,8 +31,8 @@ export const members: Member[] = [
     phone: '987-654-3210',
     profileImage: undefined,
     dateOfBirth: '1985-10-20',
-    membershipType: 'Standard',
-    membershipStatus: 'Inactive',
+    membershipType: MembershipType.Standard,
+    membershipStatus: MembershipStatus.Inactive,
     membershipStartDate: '2022-12-15',
     membershipEndDate: '2023-12-15',
     tags: [],
@@ -53,8 +52,8 @@ export const members: Member[] = [
     phone: '555-123-4567',
     profileImage: undefined,
     dateOfBirth: '1992-07-08',
-    membershipType: 'Premium',
-    membershipStatus: 'Active',
+    membershipType: MembershipType.Premium,
+    membershipStatus: MembershipStatus.Active,
     membershipStartDate: '2023-03-01',
     membershipEndDate: '2024-03-01',
     tags: [],
@@ -74,8 +73,8 @@ export const members: Member[] = [
     phone: '777-888-9999',
     profileImage: undefined,
     dateOfBirth: '1988-12-25',
-    membershipType: 'Standard',
-    membershipStatus: 'Active',
+    membershipType: MembershipType.Standard,
+    membershipStatus: MembershipStatus.Active,
     membershipStartDate: '2023-04-10',
     membershipEndDate: '2024-04-10',
     tags: [],
@@ -116,7 +115,7 @@ export const guests: Guest[] = [
     lastName: 'Brown',
     email: 'charlie.brown@example.com',
     phone: '333-444-5555',
-    visitPurpose: 'Trial',
+    visitPurpose: GuestVisitPurpose.Trial,
     relatedMemberId: 'mem-1',
     waiverSigned: true,
     checkInDateTime: new Date().toISOString(),
@@ -134,7 +133,7 @@ export const guests: Guest[] = [
     lastName: 'Van Pelt',
     email: 'lucy.vanpelt@example.com',
     phone: '444-555-6666',
-    visitPurpose: 'Tour',
+    visitPurpose: GuestVisitPurpose.Tour,
     relatedMemberId: 'mem-2',
     waiverSigned: true,
     checkInDateTime: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago

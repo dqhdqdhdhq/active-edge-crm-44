@@ -160,7 +160,7 @@ export const MemberSearchFilter = ({ onSearch, onFilterChange }: MemberSearchFil
                 <Checkbox
                   checked={tags.includes(tag)}
                   className="mr-2"
-                  readOnly // Prevents the checkbox from receiving focus
+                  onCheckedChange={() => {}} // Empty handler instead of readOnly
                 />
                 {tag}
               </Button>

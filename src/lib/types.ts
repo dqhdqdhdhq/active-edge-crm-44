@@ -1,4 +1,3 @@
-
 export interface Member {
   id: string;
   firstName: string;
@@ -29,7 +28,8 @@ export enum MembershipType {
   Senior = 'Senior',
   Family = 'Family',
   Corporate = 'Corporate',
-  Trial = 'Trial'
+  Trial = 'Trial',
+  VIP = 'VIP'
 }
 
 export enum MembershipStatus {
@@ -41,7 +41,18 @@ export enum MembershipStatus {
   Cancelled = 'Cancelled'
 }
 
-export type MemberTag = 'New Member' | 'VIP' | 'Personal Training' | 'Group Classes' | 'Referral' | 'Promotion' | 'Student' | 'Senior' | 'Corporate' | 'Family';
+export type MemberTag = 
+  | 'New Member' 
+  | 'VIP' 
+  | 'Personal Training' 
+  | 'Group Classes' 
+  | 'Referral' 
+  | 'Promotion' 
+  | 'Student' 
+  | 'Senior' 
+  | 'Corporate' 
+  | 'Family'
+  | 'Special Needs';
 
 export interface CheckIn {
   id: string;
@@ -66,11 +77,22 @@ export interface Guest {
   visitHistory: GuestVisit[];
   marketingConsent: boolean;
   notes?: string;
+  profileImage?: string;
 }
 
 export type GuestStatus = 'Checked In' | 'Checked Out' | 'Scheduled';
 
-export type GuestVisitPurpose = 'Tour' | 'Guest Pass' | 'Day Pass' | 'Event' | 'Friend of Member' | 'Potential Member' | 'Other';
+export enum GuestVisitPurpose {
+  Tour = 'Tour',
+  DayPass = 'Day Pass',
+  GuestPass = 'Guest Pass',
+  Event = 'Event',
+  FriendOfMember = 'Friend of Member',
+  PotentialMember = 'Potential Member',
+  Other = 'Other',
+  Trial = 'Trial',
+  MemberGuest = 'Member Guest'
+}
 
 export interface GuestVisit {
   id: string;
@@ -154,7 +176,6 @@ export interface DashboardStats {
   newMembers: number;
 }
 
-// Add these specific enums for ClassType and Room
 export enum ClassType {
   Yoga = 'Yoga',
   HIIT = 'HIIT',
@@ -185,14 +206,13 @@ export enum Room {
   Other = 'Other'
 }
 
-// Update GymClass to use these enums
 export interface GymClass {
   id: string;
   name: string;
-  type: ClassType;  // Use the enum
+  type: ClassType;
   description: string;
   trainerId: string;
-  room: Room;       // Use the enum
+  room: Room;
   startTime: string;
   endTime: string;
   date: string;

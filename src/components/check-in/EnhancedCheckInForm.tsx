@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -215,14 +214,14 @@ export const EnhancedCheckInForm = ({ members, onCheckIn, initialSearchTerm = ''
   const requiresWaiver = (member: Member) => {
     // Mock logic - in a real app this would check actual waiver status
     // For demo purposes, we'll consider members with 'Special Needs' tag need waivers
-    return member.tags.includes('Special Needs');
+    return member.tags.includes('Special Needs' as MemberTag);
   };
   
   // Mock data for outstanding balance
   const getOutstandingBalance = (member: Member) => {
     // Mock function - in a real app this would query actual balance
     // For demo purposes, we'll use random amounts for VIP members
-    if (member.membershipType === 'VIP') {
+    if (member.membershipType === MembershipType.VIP) {
       return Math.round(Math.random() * 100);
     }
     return 0;

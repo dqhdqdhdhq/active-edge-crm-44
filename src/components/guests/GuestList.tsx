@@ -174,7 +174,7 @@ export const GuestList = ({ guests, onViewGuest }: GuestListProps) => {
                     <span className="font-medium">{guest.firstName} {guest.lastName}</span>
                     <Badge className={cn(
                       "text-xs",
-                      guest.visitPurpose === 'Trial' ? 'bg-purple-100 text-purple-800' :
+                      guest.visitPurpose === 'Trial' ? 'bg-orange-500 text-white border-orange-500' :
                       guest.visitPurpose === 'Day Pass' ? 'bg-blue-100 text-blue-800' :
                       guest.visitPurpose === 'Tour' ? 'bg-amber-100 text-amber-800' :
                       guest.visitPurpose === 'Event' ? 'bg-green-100 text-green-800' :

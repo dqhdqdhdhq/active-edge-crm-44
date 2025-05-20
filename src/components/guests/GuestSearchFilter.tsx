@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -30,7 +29,13 @@ interface GuestSearchFilterProps {
 }
 
 const guestStatuses: GuestStatus[] = ['Checked In', 'Checked Out', 'Scheduled'];
-const visitPurposes: GuestVisitPurpose[] = ['Trial', 'Day Pass', 'Tour', 'Event', 'Member Guest'];
+const visitPurposes: GuestVisitPurpose[] = [
+  GuestVisitPurpose.Trial, 
+  GuestVisitPurpose.DayPass, 
+  GuestVisitPurpose.Tour, 
+  GuestVisitPurpose.Event, 
+  GuestVisitPurpose.MemberGuest
+];
 
 export function GuestSearchFilter({ onSearch, onFilterChange }: GuestSearchFilterProps) {
   const [searchTerm, setSearchTerm] = useState('');

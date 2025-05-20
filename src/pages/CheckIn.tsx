@@ -55,7 +55,7 @@ const CheckInPage = () => {
       relatedMemberId: guestData.relatedMemberId,
       waiverSigned: guestData.waiverSigned,
       checkInDateTime: new Date().toISOString(),
-      visitPurpose: 'Trial', // Default visit purpose
+      visitPurpose: GuestVisitPurpose.Trial, // Default visit purpose
       status: 'Checked In',
       convertedToMember: false,
       visitHistory: [],
