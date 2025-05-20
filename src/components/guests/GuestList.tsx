@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { GuestCard } from './GuestCard';
 import { Guest } from '@/lib/types';
@@ -8,6 +7,7 @@ import { Grid3X3, List, Mail, Tag, UserPlus, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
 
 interface GuestListProps {
   guests: Guest[];

@@ -598,7 +598,8 @@ export const guestVisits: GuestVisit[] = [
     checkInDateTime: getTimeToday(10, 15),
     checkOutDateTime: getTimeToday(11, 0), // Fixed: Changed '11, 00' to '11, 0'
     staffId: '1',
-    notes: 'Checked in for a complimentary trial pass'
+    notes: 'Checked in for a complimentary trial pass',
+    visitPurpose: 'Trial' // Added required visitPurpose property
   },
   {
     id: '2',
@@ -606,7 +607,8 @@ export const guestVisits: GuestVisit[] = [
     checkInDateTime: getTimeToday(14, 30),
     checkOutDateTime: getTimeToday(15, 15),
     staffId: '2',
-    notes: 'Facility tour with family'
+    notes: 'Facility tour with family',
+    visitPurpose: 'Tour' // Added required visitPurpose property
   },
   {
     id: '3',
@@ -614,7 +616,8 @@ export const guestVisits: GuestVisit[] = [
     checkInDateTime: getDateISO(-1) + 'T16:45:00.000Z',
     checkOutDateTime: getDateISO(-1) + 'T18:30:00.000Z',
     staffId: '1',
-    notes: 'Day pass'
+    notes: 'Day pass',
+    visitPurpose: 'Day Pass' // Added required visitPurpose property
   },
   {
     id: '4',
@@ -622,7 +625,8 @@ export const guestVisits: GuestVisit[] = [
     checkInDateTime: getDateISO(-3) + 'T09:00:00.000Z',
     checkOutDateTime: getDateISO(-3) + 'T11:30:00.000Z',
     staffId: '2',
-    notes: 'Charity fitness event'
+    notes: 'Charity fitness event',
+    visitPurpose: 'Event' // Added required visitPurpose property
   },
   {
     id: '5',
@@ -630,6 +634,7 @@ export const guestVisits: GuestVisit[] = [
     checkInDateTime: getTimeToday(17, 45),
     checkOutDateTime: getTimeToday(18, 0), // Fixed: Changed '18, 00' to '18, 0'
     staffId: '3',
-    notes: 'Member guest'
+    notes: 'Member guest',
+    visitPurpose: 'Member Guest' // Added required visitPurpose property
   }
 ];

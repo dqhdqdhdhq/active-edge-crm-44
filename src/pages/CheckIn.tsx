@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EnhancedCheckInForm } from '@/components/check-in/EnhancedCheckInForm';
@@ -35,21 +34,32 @@ const CheckInPage = () => {
   };
 
   const handleGuestCheckIn = (guestData: {
-    name: string;
+    name: string; // This will be split into firstName and lastName
     email?: string;
     phone?: string;
     relatedMemberId?: string;
     waiverSigned: boolean;
   }) => {
+    // Split the name into firstName and lastName
+    const nameParts = guestData.name.split(' ');
+    const firstName = nameParts[0];
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+    
     // Create a new guest record
     const newGuest: Guest = {
       id: `guest-${Date.now()}`,
-      name: guestData.name,
+      firstName: firstName,
+      lastName: lastName,
       email: guestData.email,
       phone: guestData.phone,
       relatedMemberId: guestData.relatedMemberId,
       waiverSigned: guestData.waiverSigned,
-      checkInDateTime: new Date().toISOString()
+      checkInDateTime: new Date().toISOString(),
+      visitPurpose: 'Trial', // Default visit purpose
+      status: 'Checked In',
+      convertedToMember: false,
+      visitHistory: [],
+      marketingConsent: false
     };
     
     setGuests([newGuest, ...guests]);
@@ -117,7 +127,7 @@ const CheckInPage = () => {
                       
                       return (
                         <div key={guest.id} className="p-3 border rounded-md">
-                          <p className="font-medium">{guest.name}</p>
+                          <p className="font-medium">{guest.firstName} {guest.lastName}</p>
                           {guest.email && (
                             <p className="text-sm text-muted-foreground">{guest.email}</p>
                           )}
