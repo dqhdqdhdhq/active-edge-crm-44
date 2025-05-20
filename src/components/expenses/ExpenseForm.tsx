@@ -58,7 +58,7 @@ const recurrenceFrequencies: RecurrenceFrequency[] = [
   'Bi-Weekly',
   'Monthly',
   'Quarterly',
-  'Annually',
+  'Yearly',
 ];
 
 const formSchema = z.object({
@@ -83,7 +83,7 @@ const formSchema = z.object({
   }),
   isRecurring: z.boolean().default(false),
   recurrenceFrequency: z.enum([
-    'Daily', 'Weekly', 'Bi-Weekly', 'Monthly', 'Quarterly', 'Annually'
+    'Daily', 'Weekly', 'Bi-Weekly', 'Monthly', 'Quarterly', 'Yearly'
   ]).optional(),
   recurrenceStartDate: z.date().optional(),
   recurrenceEndDate: z.date().optional(),
@@ -119,7 +119,7 @@ export function ExpenseFormDialog({
       description: expense.description,
       paymentMethod: expense.paymentMethod,
       isRecurring: expense.isRecurring,
-      recurrenceFrequency: expense.recurrenceFrequency,
+      recurrenceFrequency: expense.recurrenceFrequency as any, // Type cast to avoid TS error
       recurrenceStartDate: expense.recurrenceStartDate ? new Date(expense.recurrenceStartDate) : undefined,
       recurrenceEndDate: expense.recurrenceEndDate ? new Date(expense.recurrenceEndDate) : undefined,
       tags: expense.tags || [],

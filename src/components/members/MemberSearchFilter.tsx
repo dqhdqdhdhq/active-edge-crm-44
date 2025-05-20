@@ -1,24 +1,11 @@
-
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 import { MembershipStatus, MembershipType, MemberTag } from '@/lib/types';
-import { Search, SlidersHorizontal, X } from "lucide-react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface MemberSearchFilterProps {
   onSearch: (searchTerm: string) => void;
@@ -29,170 +16,158 @@ interface MemberSearchFilterProps {
   }) => void;
 }
 
-const membershipStatuses: MembershipStatus[] = ['Active', 'Inactive', 'Expired', 'Frozen', 'Pending'];
-const membershipTypes: MembershipType[] = ['Standard', 'Premium', 'VIP', 'Student', 'Senior', 'Family', 'Corporate'];
-const memberTags: MemberTag[] = ['VIP', 'Personal Training', 'New Member', 'Special Needs', 'Prospect', 'Corporate'];
-
-export function MemberSearchFilter({ onSearch, onFilterChange }: MemberSearchFilterProps) {
+export const MemberSearchFilter = ({ onSearch, onFilterChange }: MemberSearchFilterProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [status, setStatus] = useState<MembershipStatus | undefined>(undefined);
   const [type, setType] = useState<MembershipType | undefined>(undefined);
-  const [selectedTags, setSelectedTags] = useState<MemberTag[]>([]);
-  
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    onSearch(e.target.value);
+  const [tags, setTags] = useState<MemberTag[]>([]);
+
+  const membershipStatuses: MembershipStatus[] = [
+    MembershipStatus.Active,
+    MembershipStatus.Inactive,
+    MembershipStatus.Pending,
+    MembershipStatus.Expired,
+    MembershipStatus.Frozen,
+    MembershipStatus.Cancelled,
+  ];
+
+  const membershipTypes: MembershipType[] = [
+    MembershipType.Basic,
+    MembershipType.Standard,
+    MembershipType.Premium,
+    MembershipType.Student,
+    MembershipType.Senior,
+    MembershipType.Family,
+    MembershipType.Corporate,
+    MembershipType.Trial,
+  ];
+
+  const memberTags: MemberTag[] = [
+    'New Member',
+    'VIP',
+    'Personal Training',
+    'Group Classes',
+    'Referral',
+    'Promotion',
+    'Student',
+    'Senior',
+    'Corporate',
+    'Family',
+  ];
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    onSearch(value);
   };
-  
-  const handleStatusChange = (value: string) => {
-    const newStatus = value === 'all' ? undefined : value as MembershipStatus;
-    setStatus(newStatus);
-    onFilterChange({ status: newStatus, type, tags: selectedTags });
+
+  const handleStatusChange = (value: MembershipStatus | undefined) => {
+    setStatus(value);
+    onFilterChange({ status: value, type, tags });
   };
-  
-  const handleTypeChange = (value: string) => {
-    const newType = value === 'all' ? undefined : value as MembershipType;
-    setType(newType);
-    onFilterChange({ status, type: newType, tags: selectedTags });
+
+  const handleTypeChange = (value: MembershipType | undefined) => {
+    setType(value);
+    onFilterChange({ status, type: value, tags });
   };
-  
+
   const handleTagToggle = (tag: MemberTag) => {
-    const newTags = selectedTags.includes(tag)
-      ? selectedTags.filter(t => t !== tag)
-      : [...selectedTags, tag];
-    
-    setSelectedTags(newTags);
+    const newTags = tags.includes(tag) ? tags.filter(t => t !== tag) : [...tags, tag];
+    setTags(newTags);
     onFilterChange({ status, type, tags: newTags });
   };
 
-  const clearFilters = () => {
+  const handleClearFilters = () => {
     setStatus(undefined);
     setType(undefined);
-    setSelectedTags([]);
-    onFilterChange({ tags: [] });
+    setTags([]);
+    setSearchTerm('');
+    onSearch('');
+    onFilterChange({ status: undefined, type: undefined, tags: [] });
   };
 
-  const hasActiveFilters = status !== undefined || type !== undefined || selectedTags.length > 0;
-  
+  const hasActiveFilters = !!status || !!type || tags.length > 0 || searchTerm;
+
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+    <div className="space-y-4 p-4 border rounded-md bg-muted/30">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-medium">Search & Filters</h2>
+        {hasActiveFilters && (
+          <Button variant="ghost" size="sm" onClick={handleClearFilters}>
+            <X className="mr-2 h-4 w-4" />
+            Clear filters
+          </Button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Search Input */}
+        <div>
+          <Label htmlFor="search">Search Members</Label>
           <Input
             type="search"
-            placeholder="Search by name or email..."
-            className="pl-8"
+            id="search"
+            placeholder="Search by name, email, or phone..."
             value={searchTerm}
-            onChange={handleSearch}
+            onChange={handleSearchChange}
           />
         </div>
-        
-        <div className="flex gap-2">
-          <Select value={status || 'all'} onValueChange={handleStatusChange}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Status" />
+
+        {/* Membership Status Filter */}
+        <div>
+          <Label htmlFor="status">Membership Status</Label>
+          <Select onValueChange={(value) => handleStatusChange(value as MembershipStatus)}>
+            <SelectTrigger id="status">
+              <SelectValue placeholder="Select Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              {membershipStatuses.map(status => (
-                <SelectItem key={status} value={status}>{status}</SelectItem>
+              {membershipStatuses.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          
-          <Select value={type || 'all'} onValueChange={handleTypeChange}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Membership" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Memberships</SelectItem>
-              {membershipTypes.map(type => (
-                <SelectItem key={type} value={type}>{type}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="icon">
-                <SlidersHorizontal className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-4" align="end">
-              <div className="space-y-4">
-                <h4 className="font-medium text-sm">Member Tags</h4>
-                <div className="space-y-2">
-                  {memberTags.map(tag => (
-                    <div key={tag} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`tag-${tag}`}
-                        checked={selectedTags.includes(tag)}
-                        onCheckedChange={() => handleTagToggle(tag)}
-                      />
-                      <Label htmlFor={`tag-${tag}`} className="text-sm font-normal">
-                        {tag}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
         </div>
-      </div>
-      
-      {hasActiveFilters && (
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-sm text-muted-foreground">Filters:</span>
-          
-          {status && (
-            <Badge variant="outline" className="px-2 py-0 h-6">
-              {status}
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-4 w-4 ml-1 p-0" 
-                onClick={() => handleStatusChange('all')}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
-          )}
-          
-          {type && (
-            <Badge variant="outline" className="px-2 py-0 h-6">
-              {type}
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-4 w-4 ml-1 p-0" 
-                onClick={() => handleTypeChange('all')}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
-          )}
-          
-          {selectedTags.map(tag => (
-            <Badge key={tag} variant="outline" className="px-2 py-0 h-6">
-              {tag}
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-4 w-4 ml-1 p-0" 
+
+        {/* Membership Type Filter */}
+        <div>
+          <Label htmlFor="type">Membership Type</Label>
+          <Select onValueChange={(value) => handleTypeChange(value as MembershipType)}>
+            <SelectTrigger id="type">
+              <SelectValue placeholder="Select Type" />
+            </SelectTrigger>
+            <SelectContent>
+              {membershipTypes.map((t) => (
+                <SelectItem key={t} value={t}>
+                  {t}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Member Tags Filter */}
+        <div className="md:col-span-3">
+          <Label>Member Tags</Label>
+          <div className="flex flex-wrap gap-2">
+            {memberTags.map((tag) => (
+              <Button
+                key={tag}
+                variant={tags.includes(tag) ? 'default' : 'outline'}
                 onClick={() => handleTagToggle(tag)}
               >
-                <X className="h-3 w-3" />
+                <Checkbox
+                  checked={tags.includes(tag)}
+                  className="mr-2"
+                  readOnly // Prevents the checkbox from receiving focus
+                />
+                {tag}
               </Button>
-            </Badge>
-          ))}
-          
-          <Button variant="ghost" size="sm" className="h-6 px-2" onClick={clearFilters}>
-            Clear all
-          </Button>
+            ))}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
-}
+};

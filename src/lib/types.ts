@@ -7,11 +7,11 @@ export interface Member {
   phone: string;
   profileImage?: string;
   dateOfBirth: string;
-  membershipType: string;
-  membershipStatus: string;
+  membershipType: MembershipType;
+  membershipStatus: MembershipStatus;
   membershipStartDate: string;
   membershipEndDate: string;
-  tags: string[];
+  tags: MemberTag[];
   emergencyContact: {
     name: string;
     phone: string;
@@ -20,6 +20,28 @@ export interface Member {
   notes?: string;
   checkIns: CheckIn[];
 }
+
+export enum MembershipType {
+  Basic = 'Basic',
+  Standard = 'Standard',
+  Premium = 'Premium',
+  Student = 'Student',
+  Senior = 'Senior',
+  Family = 'Family',
+  Corporate = 'Corporate',
+  Trial = 'Trial'
+}
+
+export enum MembershipStatus {
+  Active = 'Active',
+  Inactive = 'Inactive',
+  Pending = 'Pending',
+  Expired = 'Expired',
+  Frozen = 'Frozen',
+  Cancelled = 'Cancelled'
+}
+
+export type MemberTag = 'New Member' | 'VIP' | 'Personal Training' | 'Group Classes' | 'Referral' | 'Promotion' | 'Student' | 'Senior' | 'Corporate' | 'Family';
 
 export interface CheckIn {
   id: string;
@@ -33,12 +55,12 @@ export interface Guest {
   lastName: string;
   email: string;
   phone: string;
-  visitPurpose: string;
+  visitPurpose: GuestVisitPurpose;
   relatedMemberId?: string;
   waiverSigned: boolean;
   checkInDateTime: string;
   checkOutDateTime?: string;
-  status: 'Checked In' | 'Checked Out';
+  status: GuestStatus;
   convertedToMember: boolean;
   referralSource?: string;
   visitHistory: GuestVisit[];
@@ -46,12 +68,17 @@ export interface Guest {
   notes?: string;
 }
 
+export type GuestStatus = 'Checked In' | 'Checked Out' | 'Scheduled';
+
+export type GuestVisitPurpose = 'Tour' | 'Guest Pass' | 'Day Pass' | 'Event' | 'Friend of Member' | 'Potential Member' | 'Other';
+
 export interface GuestVisit {
   id: string;
   guestId: string;
   checkInDateTime: string;
   checkOutDateTime?: string;
-  purpose: string;
+  purpose: GuestVisitPurpose;
+  staffId?: string;
   notes?: string;
 }
 
@@ -85,7 +112,7 @@ export interface Expense {
 
 export type PaymentMethod = 'Credit Card' | 'Cash' | 'Check' | 'Bank Transfer' | 'Other';
 
-export type RecurrenceFrequency = 'Daily' | 'Weekly' | 'Monthly' | 'Quarterly' | 'Yearly';
+export type RecurrenceFrequency = 'Daily' | 'Weekly' | 'Bi-Weekly' | 'Monthly' | 'Quarterly' | 'Yearly' | 'Annually';
 
 export interface ExpenseReceipt {
   id: string;
@@ -95,6 +122,8 @@ export interface ExpenseReceipt {
   fileType: string;
   uploadedAt: string;
 }
+
+export type Receipt = ExpenseReceipt; // Alias for backward compatibility
 
 export interface ExpenseBudget {
   id: string;
@@ -188,4 +217,16 @@ export interface Trainer {
   }[];
   assignedClasses: string[];
   assignedMembers: string[];
+  performance?: TrainerPerformance;
+}
+
+export interface TrainerPerformance {
+  classesCount: number;
+  attendanceRate: number;
+  clientRetentionRate: number;
+  ptSessionsCount: number;
+  memberFeedback: number;
+  revenueGenerated: number;
+  rankLastMonth?: number;
+  rankChange?: number;
 }

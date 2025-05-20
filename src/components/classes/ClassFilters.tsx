@@ -37,11 +37,13 @@ export const ClassFilters = ({ filters, onFilterChange, trainers }: ClassFilters
   ];
 
   const classTypeOptions: ClassType[] = [
-    "Yoga", "Spin", "HIIT", "Pilates", "Zumba", "Boxing", "CrossFit", "Strength", "Cardio"
+    ClassType.Yoga, ClassType.Spin, ClassType.HIIT, ClassType.Pilates, 
+    ClassType.Zumba, ClassType.Boxing, ClassType.CrossFit, ClassType.Strength, ClassType.Cardio
   ];
 
   const roomOptions: Room[] = [
-    "Studio A", "Studio B", "Main Floor", "Spin Room", "Yoga Studio", "Pool", "Outdoor"
+    Room.StudioA, Room.StudioB, Room.MainFloor, Room.SpinRoom, 
+    Room.YogaStudio, Room.Pool, Room.Outdoor
   ];
 
   const availabilityOptions = [
@@ -57,7 +59,7 @@ export const ClassFilters = ({ filters, onFilterChange, trainers }: ClassFilters
   };
 
   // Handle toggle arrays (timeOfDay, classType, etc)
-  const handleToggleFilter = (filterName: string, value: string) => {
+  const handleToggleFilter = (filterName: string, value: string | ClassType | Room) => {
     // Check if the current filter is the dateRange, which isn't an array
     if (filterName === 'dateRange') {
       // Handle dateRange separately as an object
@@ -68,9 +70,9 @@ export const ClassFilters = ({ filters, onFilterChange, trainers }: ClassFilters
     // For array-type filters, we need proper type checking
     if (filterName === 'timeOfDay') {
       const currentValues = filters.timeOfDay;
-      const newValues = currentValues.includes(value)
+      const newValues = currentValues.includes(value as string)
         ? currentValues.filter(v => v !== value)
-        : [...currentValues, value];
+        : [...currentValues, value as string];
       onFilterChange({ [filterName]: newValues });
     } else if (filterName === 'classType') {
       const currentValues = filters.classType;
@@ -80,9 +82,9 @@ export const ClassFilters = ({ filters, onFilterChange, trainers }: ClassFilters
       onFilterChange({ [filterName]: newValues });
     } else if (filterName === 'trainerId') {
       const currentValues = filters.trainerId;
-      const newValues = currentValues.includes(value)
+      const newValues = currentValues.includes(value as string)
         ? currentValues.filter(v => v !== value)
-        : [...currentValues, value];
+        : [...currentValues, value as string];
       onFilterChange({ [filterName]: newValues });
     } else if (filterName === 'room') {
       const currentValues = filters.room;
@@ -92,9 +94,9 @@ export const ClassFilters = ({ filters, onFilterChange, trainers }: ClassFilters
       onFilterChange({ [filterName]: newValues });
     } else if (filterName === 'availability') {
       const currentValues = filters.availability;
-      const newValues = currentValues.includes(value)
+      const newValues = currentValues.includes(value as string)
         ? currentValues.filter(v => v !== value)
-        : [...currentValues, value];
+        : [...currentValues, value as string];
       onFilterChange({ [filterName]: newValues });
     }
   };
