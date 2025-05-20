@@ -1,9 +1,14 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { MemberPortalConfig, MemberPortalAnnouncement, MemberPortalResource, MemberPortalFaqCategory } from "@/lib/types";
+import { 
+  MemberPortalConfig, 
+  MemberPortalAnnouncement, 
+  MemberPortalFaqCategory,
+  MemberPortalResource,
+  MemberPortalFaqQuestion
+} from "@/lib/types";
 import { 
   Table, 
   TableBody, 
@@ -16,11 +21,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, FileIcon, Trash, Edit, Plus, FileText, Folder } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { CalendarIcon, PlusCircle, Trash2, Edit, FileQuestion, Megaphone, FileText, FileEdit, Plus } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface MemberPortalContentSettingsProps {
   config: MemberPortalConfig;
@@ -45,7 +53,7 @@ export function MemberPortalContentSettings({
     content: "",
     isSticky: false,
     isImportant: false,
-    publishDate: new Date().toISOString().split('T')[0],
+    publishDate: new Date().toISOString(),
     isPublished: true
   });
   
@@ -55,7 +63,7 @@ export function MemberPortalContentSettings({
   const [newResource, setNewResource] = useState<Partial<MemberPortalResource>>({
     name: "",
     description: "",
-    category: "General",
+    category: "",
     fileUrl: "",
     fileType: "pdf",
     isVisible: true,
@@ -72,13 +80,13 @@ export function MemberPortalContentSettings({
   });
   
   const [faqQuestionDialogOpen, setFaqQuestionDialogOpen] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [editingFaqQuestion, setEditingFaqQuestion] = useState<{id: string, question: string, answer: string, order: number} | null>(null);
-  const [newFaqQuestion, setNewFaqQuestion] = useState<{question: string, answer: string, order: number}>({
+  const [editingFaqQuestion, setEditingFaqQuestion] = useState<MemberPortalFaqQuestion | null>(null);
+  const [newFaqQuestion, setNewFaqQuestion] = useState<Partial<MemberPortalFaqQuestion>>({
     question: "",
     answer: "",
     order: 0
   });
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
   // Announcements handlers
   const handleAnnouncementSubmit = () => {
@@ -87,7 +95,16 @@ export function MemberPortalContentSettings({
       setConfig(prev => ({
         ...prev,
         announcements: prev.announcements.map(a => 
-          a.id === editingAnnouncement.id ? { ...editingAnnouncement, ...newAnnouncement } : a
+          a.id === editingAnnouncement.id ? { 
+            ...editingAnnouncement, 
+            title: newAnnouncement.title || "", 
+            content: newAnnouncement.content || "",
+            isSticky: newAnnouncement.isSticky || false,
+            isImportant: newAnnouncement.isImportant || false,
+            publishDate: newAnnouncement.publishDate || new Date().toISOString(),
+            expiryDate: newAnnouncement.expiryDate,
+            isPublished: newAnnouncement.isPublished || false
+          } : a
         )
       }));
     } else {
@@ -115,7 +132,7 @@ export function MemberPortalContentSettings({
       content: "",
       isSticky: false,
       isImportant: false,
-      publishDate: new Date().toISOString().split('T')[0],
+      publishDate: new Date().toISOString(),
       isPublished: true
     });
     setEditingAnnouncement(null);
@@ -129,8 +146,8 @@ export function MemberPortalContentSettings({
       content: announcement.content,
       isSticky: announcement.isSticky,
       isImportant: announcement.isImportant,
-      publishDate: announcement.publishDate.split('T')[0],
-      expiryDate: announcement.expiryDate?.split('T')[0],
+      publishDate: announcement.publishDate,
+      expiryDate: announcement.expiryDate,
       isPublished: announcement.isPublished
     });
     setAnnouncementDialogOpen(true);
@@ -150,7 +167,15 @@ export function MemberPortalContentSettings({
       setConfig(prev => ({
         ...prev,
         resources: prev.resources.map(r => 
-          r.id === editingResource.id ? { ...editingResource, ...newResource } : r
+          r.id === editingResource.id ? { 
+            ...editingResource, 
+            name: newResource.name || "", 
+            description: newResource.description || "",
+            category: newResource.category || "",
+            fileUrl: newResource.fileUrl || "",
+            fileType: newResource.fileType || "pdf",
+            isVisible: newResource.isVisible ?? true
+          } : r
         )
       }));
     } else {
@@ -159,7 +184,7 @@ export function MemberPortalContentSettings({
         id: `resource-${Date.now()}`,
         name: newResource.name || "",
         description: newResource.description || "",
-        category: newResource.category || "General",
+        category: newResource.category || "",
         fileUrl: newResource.fileUrl || "",
         fileType: newResource.fileType || "pdf",
         isVisible: newResource.isVisible ?? true,
@@ -176,7 +201,7 @@ export function MemberPortalContentSettings({
     setNewResource({
       name: "",
       description: "",
-      category: "General",
+      category: "",
       fileUrl: "",
       fileType: "pdf",
       isVisible: true,
@@ -213,15 +238,23 @@ export function MemberPortalContentSettings({
       setConfig(prev => ({
         ...prev,
         faqCategories: prev.faqCategories.map(c => 
-          c.id === editingFaqCategory.id ? { ...editingFaqCategory, name: newFaqCategory.name || "", order: newFaqCategory.order || 0 } : c
+          c.id === editingFaqCategory.id ? { 
+            ...editingFaqCategory, 
+            name: newFaqCategory.name || "", 
+            order: newFaqCategory.order || 0
+          } : c
         )
       }));
     } else {
       // Add new category
+      const nextOrder = config.faqCategories.length > 0 
+        ? Math.max(...config.faqCategories.map(c => c.order)) + 1 
+        : 0;
+        
       const category: MemberPortalFaqCategory = {
         id: `faq-category-${Date.now()}`,
         name: newFaqCategory.name || "",
-        order: config.faqCategories.length,
+        order: newFaqCategory.order ?? nextOrder,
         questions: []
       };
       
@@ -245,7 +278,8 @@ export function MemberPortalContentSettings({
     setEditingFaqCategory(category);
     setNewFaqCategory({
       name: category.name,
-      order: category.order
+      order: category.order,
+      questions: category.questions
     });
     setFaqCategoryDialogOpen(true);
   };
@@ -261,39 +295,46 @@ export function MemberPortalContentSettings({
   const handleFaqQuestionSubmit = () => {
     if (!selectedCategoryId) return;
     
+    const categoryIndex = config.faqCategories.findIndex(c => c.id === selectedCategoryId);
+    if (categoryIndex === -1) return;
+    
     if (editingFaqQuestion) {
       // Update existing question
-      setConfig(prev => ({
-        ...prev,
-        faqCategories: prev.faqCategories.map(c => 
-          c.id === selectedCategoryId 
-            ? {
-                ...c, 
-                questions: c.questions.map(q => 
-                  q.id === editingFaqQuestion.id 
-                    ? { ...q, question: newFaqQuestion.question, answer: newFaqQuestion.answer, order: newFaqQuestion.order } 
-                    : q
-                )
-              } 
-            : c
-        )
-      }));
+      const updatedCategories = [...config.faqCategories];
+      const questionIndex = updatedCategories[categoryIndex].questions.findIndex(q => q.id === editingFaqQuestion.id);
+      
+      if (questionIndex !== -1) {
+        updatedCategories[categoryIndex].questions[questionIndex] = {
+          ...editingFaqQuestion,
+          question: newFaqQuestion.question || "",
+          answer: newFaqQuestion.answer || "",
+          order: newFaqQuestion.order || 0
+        };
+        
+        setConfig(prev => ({
+          ...prev,
+          faqCategories: updatedCategories
+        }));
+      }
     } else {
       // Add new question
-      const question = {
+      const nextOrder = config.faqCategories[categoryIndex].questions.length > 0 
+        ? Math.max(...config.faqCategories[categoryIndex].questions.map(q => q.order)) + 1 
+        : 0;
+        
+      const question: MemberPortalFaqQuestion = {
         id: `faq-question-${Date.now()}`,
-        question: newFaqQuestion.question,
-        answer: newFaqQuestion.answer,
-        order: newFaqQuestion.order
+        question: newFaqQuestion.question || "",
+        answer: newFaqQuestion.answer || "",
+        order: newFaqQuestion.order ?? nextOrder
       };
+      
+      const updatedCategories = [...config.faqCategories];
+      updatedCategories[categoryIndex].questions.push(question);
       
       setConfig(prev => ({
         ...prev,
-        faqCategories: prev.faqCategories.map(c => 
-          c.id === selectedCategoryId 
-            ? { ...c, questions: [...c.questions, question] } 
-            : c
-        )
+        faqCategories: updatedCategories
       }));
     }
     
@@ -307,20 +348,7 @@ export function MemberPortalContentSettings({
     setFaqQuestionDialogOpen(false);
   };
   
-  const handleAddFaqQuestion = (categoryId: string) => {
-    setSelectedCategoryId(categoryId);
-    const category = config.faqCategories.find(c => c.id === categoryId);
-    if (category) {
-      setNewFaqQuestion({
-        question: "",
-        answer: "",
-        order: category.questions.length
-      });
-    }
-    setFaqQuestionDialogOpen(true);
-  };
-  
-  const handleFaqQuestionEdit = (categoryId: string, question: { id: string, question: string, answer: string, order: number }) => {
+  const handleFaqQuestionEdit = (categoryId: string, question: MemberPortalFaqQuestion) => {
     setSelectedCategoryId(categoryId);
     setEditingFaqQuestion(question);
     setNewFaqQuestion({
@@ -332,29 +360,31 @@ export function MemberPortalContentSettings({
   };
   
   const handleFaqQuestionDelete = (categoryId: string, questionId: string) => {
+    const categoryIndex = config.faqCategories.findIndex(c => c.id === categoryId);
+    if (categoryIndex === -1) return;
+    
+    const updatedCategories = [...config.faqCategories];
+    updatedCategories[categoryIndex].questions = updatedCategories[categoryIndex].questions.filter(q => q.id !== questionId);
+    
     setConfig(prev => ({
       ...prev,
-      faqCategories: prev.faqCategories.map(c => 
-        c.id === categoryId 
-          ? { ...c, questions: c.questions.filter(q => q.id !== questionId) } 
-          : c
-      )
+      faqCategories: updatedCategories
     }));
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Content Management</CardTitle>
+        <CardTitle>Content Settings</CardTitle>
         <CardDescription>
-          Manage content that will be displayed to members in the portal
+          Manage announcements, resources, and FAQs for the member portal
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="announcements">Announcements</TabsTrigger>
-            <TabsTrigger value="resources">Resource Library</TabsTrigger>
+            <TabsTrigger value="resources">Resources</TabsTrigger>
             <TabsTrigger value="faqs">FAQs</TabsTrigger>
           </TabsList>
           
@@ -384,6 +414,7 @@ export function MemberPortalContentSettings({
                           id="announcement-title"
                           value={newAnnouncement.title || ""}
                           onChange={(e) => setNewAnnouncement({ ...newAnnouncement, title: e.target.value })}
+                          placeholder="e.g., Holiday Hours, New Class Schedule, etc."
                         />
                       </div>
                       <div className="space-y-2">
@@ -392,59 +423,106 @@ export function MemberPortalContentSettings({
                           id="announcement-content"
                           value={newAnnouncement.content || ""}
                           onChange={(e) => setNewAnnouncement({ ...newAnnouncement, content: e.target.value })}
-                          rows={6}
+                          placeholder="Announcement content..."
+                          rows={5}
                         />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="publish-date">Publish Date</Label>
-                          <Input
-                            id="publish-date"
-                            type="date"
-                            value={newAnnouncement.publishDate || ""}
-                            onChange={(e) => setNewAnnouncement({ ...newAnnouncement, publishDate: e.target.value })}
-                          />
+                          <Label>Publish Date</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className="w-full justify-start text-left font-normal"
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {newAnnouncement.publishDate ? (
+                                  format(new Date(newAnnouncement.publishDate), "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                              <Calendar
+                                mode="single"
+                                selected={newAnnouncement.publishDate ? new Date(newAnnouncement.publishDate) : undefined}
+                                onSelect={(date) => setNewAnnouncement({ ...newAnnouncement, publishDate: date ? date.toISOString() : new Date().toISOString() })}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="expiry-date">Expiry Date (Optional)</Label>
-                          <Input
-                            id="expiry-date"
-                            type="date"
-                            value={newAnnouncement.expiryDate || ""}
-                            onChange={(e) => setNewAnnouncement({ ...newAnnouncement, expiryDate: e.target.value })}
-                          />
+                          <Label>Expiry Date (Optional)</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className="w-full justify-start text-left font-normal"
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {newAnnouncement.expiryDate ? (
+                                  format(new Date(newAnnouncement.expiryDate), "PPP")
+                                ) : (
+                                  <span>No expiry</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                              <div className="p-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setNewAnnouncement({ ...newAnnouncement, expiryDate: undefined })}
+                                >
+                                  Clear date
+                                </Button>
+                              </div>
+                              <Calendar
+                                mode="single"
+                                selected={newAnnouncement.expiryDate ? new Date(newAnnouncement.expiryDate) : undefined}
+                                onSelect={(date) => setNewAnnouncement({ ...newAnnouncement, expiryDate: date ? date.toISOString() : undefined })}
+                                fromDate={newAnnouncement.publishDate ? new Date(newAnnouncement.publishDate) : new Date()}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
                         </div>
                       </div>
-                      <div className="flex flex-col gap-4 pt-2">
+                      <div className="space-y-4 pt-2">
                         <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id="is-sticky"
+                          <Switch
+                            id="announcement-sticky"
                             checked={newAnnouncement.isSticky}
                             onCheckedChange={(checked) => 
-                              setNewAnnouncement({ ...newAnnouncement, isSticky: checked as boolean })
+                              setNewAnnouncement({ ...newAnnouncement, isSticky: checked })
                             }
                           />
-                          <Label htmlFor="is-sticky">Sticky (Pin to top)</Label>
+                          <Label htmlFor="announcement-sticky">Pin to top of announcements</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id="is-important"
+                          <Switch
+                            id="announcement-important"
                             checked={newAnnouncement.isImportant}
                             onCheckedChange={(checked) => 
-                              setNewAnnouncement({ ...newAnnouncement, isImportant: checked as boolean })
+                              setNewAnnouncement({ ...newAnnouncement, isImportant: checked })
                             }
                           />
-                          <Label htmlFor="is-important">Mark as Important</Label>
+                          <Label htmlFor="announcement-important">Mark as important</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id="is-published"
+                          <Switch
+                            id="announcement-published"
                             checked={newAnnouncement.isPublished}
                             onCheckedChange={(checked) => 
-                              setNewAnnouncement({ ...newAnnouncement, isPublished: checked as boolean })
+                              setNewAnnouncement({ ...newAnnouncement, isPublished: checked })
                             }
                           />
-                          <Label htmlFor="is-published">Published</Label>
+                          <Label htmlFor="announcement-published">
+                            {newAnnouncement.isPublished ? "Published" : "Draft"}
+                          </Label>
                         </div>
                       </div>
                     </div>
@@ -462,14 +540,14 @@ export function MemberPortalContentSettings({
               
               {config.announcements.length === 0 ? (
                 <div className="text-center py-10 border rounded-md bg-muted/30">
-                  <h3 className="text-lg font-medium mb-2">No Announcements Yet</h3>
-                  <p className="text-muted-foreground mb-4">Create your first announcement for the member portal</p>
+                  <h3 className="text-lg font-medium mb-2">No Announcements</h3>
+                  <p className="text-muted-foreground mb-4">Create announcements to display on the member portal</p>
                   <Button 
                     variant="outline" 
                     onClick={() => setAnnouncementDialogOpen(true)}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Add Announcement
+                    Add Your First Announcement
                   </Button>
                 </div>
               ) : (
@@ -487,33 +565,31 @@ export function MemberPortalContentSettings({
                     {config.announcements.map((announcement) => (
                       <TableRow key={announcement.id}>
                         <TableCell className="font-medium">
-                          {announcement.title}
-                          <div className="flex gap-1 mt-1">
-                            {announcement.isSticky && (
-                              <Badge variant="outline" className="text-xs">Sticky</Badge>
-                            )}
-                            {announcement.isImportant && (
-                              <Badge variant="outline" className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-200 text-xs">
-                                Important
-                              </Badge>
-                            )}
+                          <div className="flex items-center gap-2">
+                            <Megaphone className="h-4 w-4 text-muted-foreground" />
+                            <div>
+                              {announcement.title}
+                              <div className="flex gap-1.5 mt-1">
+                                {announcement.isSticky && (
+                                  <Badge variant="secondary" className="text-xs">Pinned</Badge>
+                                )}
+                                {announcement.isImportant && (
+                                  <Badge variant="default" className="text-xs">Important</Badge>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge 
-                            variant={announcement.isPublished ? "default" : "secondary"}
-                            className="text-xs"
-                          >
+                          <Badge variant={announcement.isPublished ? "outline" : "secondary"}>
                             {announcement.isPublished ? "Published" : "Draft"}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {new Date(announcement.publishDate).toLocaleDateString()}
+                          {announcement.publishDate && format(new Date(announcement.publishDate), "MMM d, yyyy")}
                         </TableCell>
                         <TableCell>
-                          {announcement.expiryDate 
-                            ? new Date(announcement.expiryDate).toLocaleDateString() 
-                            : "No expiry"}
+                          {announcement.expiryDate ? format(new Date(announcement.expiryDate), "MMM d, yyyy") : "-"}
                         </TableCell>
                         <TableCell className="text-right flex justify-end space-x-2">
                           <Button 
@@ -528,7 +604,7 @@ export function MemberPortalContentSettings({
                             size="sm"
                             onClick={() => handleAnnouncementDelete(announcement.id)}
                           >
-                            <Trash className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -543,7 +619,7 @@ export function MemberPortalContentSettings({
           <TabsContent value="resources">
             <div className="space-y-6">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">Resource Library</h3>
+                <h3 className="text-lg font-medium">Resources</h3>
                 <Dialog open={resourceDialogOpen} onOpenChange={setResourceDialogOpen}>
                   <DialogTrigger asChild>
                     <Button>
@@ -555,7 +631,7 @@ export function MemberPortalContentSettings({
                     <DialogHeader>
                       <DialogTitle>{editingResource ? "Edit Resource" : "Add New Resource"}</DialogTitle>
                       <DialogDescription>
-                        {editingResource ? "Update resource details" : "Upload a new resource to the library"}
+                        {editingResource ? "Update resource details" : "Upload documents and resources for members"}
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
@@ -565,6 +641,7 @@ export function MemberPortalContentSettings({
                           id="resource-name"
                           value={newResource.name || ""}
                           onChange={(e) => setNewResource({ ...newResource, name: e.target.value })}
+                          placeholder="e.g., Membership Guide, Workout Plan, etc."
                         />
                       </div>
                       <div className="space-y-2">
@@ -573,40 +650,52 @@ export function MemberPortalContentSettings({
                           id="resource-description"
                           value={newResource.description || ""}
                           onChange={(e) => setNewResource({ ...newResource, description: e.target.value })}
+                          placeholder="Brief description of this resource..."
                           rows={3}
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="resource-category">Category</Label>
-                        <Input
-                          id="resource-category"
-                          value={newResource.category || ""}
-                          onChange={(e) => setNewResource({ ...newResource, category: e.target.value })}
-                          placeholder="e.g., Gym Policies, Nutrition Guides, etc."
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="resource-file">File Upload</Label>
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" className="h-10">
-                            Upload File
-                          </Button>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="resource-category">Category</Label>
                           <Input
-                            id="resource-file-url"
-                            placeholder="Or enter file URL"
-                            value={newResource.fileUrl || ""}
-                            onChange={(e) => setNewResource({ ...newResource, fileUrl: e.target.value })}
+                            id="resource-category"
+                            value={newResource.category || ""}
+                            onChange={(e) => setNewResource({ ...newResource, category: e.target.value })}
+                            placeholder="e.g., Forms, Guides, Programs"
                           />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="resource-type">File Type</Label>
+                          <Select 
+                            value={newResource.fileType} 
+                            onValueChange={(value) => setNewResource({ ...newResource, fileType: value })}
+                          >
+                            <SelectTrigger id="resource-type">
+                              <SelectValue placeholder="Select file type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pdf">PDF Document</SelectItem>
+                              <SelectItem value="doc">Word Document</SelectItem>
+                              <SelectItem value="xls">Excel Spreadsheet</SelectItem>
+                              <SelectItem value="ppt">PowerPoint</SelectItem>
+                              <SelectItem value="image">Image</SelectItem>
+                              <SelectItem value="video">Video</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="resource-file-type">File Type</Label>
+                        <Label htmlFor="resource-url">File URL</Label>
                         <Input
-                          id="resource-file-type"
-                          value={newResource.fileType || ""}
-                          onChange={(e) => setNewResource({ ...newResource, fileType: e.target.value })}
-                          placeholder="e.g., pdf, docx, jpg"
+                          id="resource-url"
+                          value={newResource.fileUrl || ""}
+                          onChange={(e) => setNewResource({ ...newResource, fileUrl: e.target.value })}
+                          placeholder="https://example.com/files/resource.pdf"
                         />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Enter the URL where this file is hosted. For optimal performance, use a CDN or file hosting service.
+                        </p>
                       </div>
                       <div className="flex items-center space-x-2 pt-2">
                         <Switch
@@ -616,7 +705,7 @@ export function MemberPortalContentSettings({
                             setNewResource({ ...newResource, isVisible: checked })
                           }
                         />
-                        <Label htmlFor="resource-visible">Visible to Members</Label>
+                        <Label htmlFor="resource-visible">Make this resource visible to members</Label>
                       </div>
                     </div>
                     <DialogFooter>
@@ -633,25 +722,25 @@ export function MemberPortalContentSettings({
               
               {config.resources.length === 0 ? (
                 <div className="text-center py-10 border rounded-md bg-muted/30">
-                  <h3 className="text-lg font-medium mb-2">Resource Library Empty</h3>
-                  <p className="text-muted-foreground mb-4">Upload documents, guides, and other resources for your members</p>
+                  <h3 className="text-lg font-medium mb-2">No Resources</h3>
+                  <p className="text-muted-foreground mb-4">Upload resources like documents, forms, and guides</p>
                   <Button 
                     variant="outline" 
                     onClick={() => setResourceDialogOpen(true)}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Add Resource
+                    Add Your First Resource
                   </Button>
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[300px]">Resource</TableHead>
+                      <TableHead className="w-[250px]">Name</TableHead>
+                      <TableHead className="w-[250px]">Description</TableHead>
                       <TableHead>Category</TableHead>
                       <TableHead>Type</TableHead>
-                      <TableHead>Visibility</TableHead>
-                      <TableHead>Upload Date</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -660,27 +749,27 @@ export function MemberPortalContentSettings({
                       <TableRow key={resource.id}>
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-2">
-                            <FileIcon className="h-4 w-4" />
-                            <div>
-                              <div>{resource.name}</div>
-                              <div className="text-xs text-muted-foreground truncate max-w-[250px]">
-                                {resource.description}
-                              </div>
-                            </div>
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                            {resource.name}
                           </div>
                         </TableCell>
-                        <TableCell>{resource.category}</TableCell>
-                        <TableCell>{resource.fileType.toUpperCase()}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {resource.description}
+                        </TableCell>
                         <TableCell>
-                          <Badge 
-                            variant={resource.isVisible ? "default" : "secondary"}
-                            className="text-xs"
-                          >
-                            {resource.isVisible ? "Visible" : "Hidden"}
+                          <Badge variant="outline">
+                            {resource.category}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {new Date(resource.uploadDate).toLocaleDateString()}
+                          <Badge variant="secondary">
+                            {resource.fileType.toUpperCase()}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={resource.isVisible ? "outline" : "secondary"}>
+                            {resource.isVisible ? "Visible" : "Hidden"}
+                          </Badge>
                         </TableCell>
                         <TableCell className="text-right flex justify-end space-x-2">
                           <Button 
@@ -695,7 +784,7 @@ export function MemberPortalContentSettings({
                             size="sm"
                             onClick={() => handleResourceDelete(resource.id)}
                           >
-                            <Trash className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -710,19 +799,19 @@ export function MemberPortalContentSettings({
           <TabsContent value="faqs">
             <div className="space-y-6">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">FAQs</h3>
+                <h3 className="text-lg font-medium">Frequently Asked Questions</h3>
                 <Dialog open={faqCategoryDialogOpen} onOpenChange={setFaqCategoryDialogOpen}>
                   <DialogTrigger asChild>
                     <Button>
                       <PlusCircle className="mr-2 h-4 w-4" />
-                      Add FAQ Category
+                      Add Category
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
-                      <DialogTitle>{editingFaqCategory ? "Edit Category" : "Add New FAQ Category"}</DialogTitle>
+                      <DialogTitle>{editingFaqCategory ? "Edit FAQ Category" : "Add New FAQ Category"}</DialogTitle>
                       <DialogDescription>
-                        {editingFaqCategory ? "Update category details" : "Create a new category for organizing FAQs"}
+                        Create a category to organize related FAQs
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
@@ -732,6 +821,7 @@ export function MemberPortalContentSettings({
                           id="category-name"
                           value={newFaqCategory.name || ""}
                           onChange={(e) => setNewFaqCategory({ ...newFaqCategory, name: e.target.value })}
+                          placeholder="e.g., Membership, Facilities, Classes"
                         />
                       </div>
                       <div className="space-y-2">
@@ -739,13 +829,13 @@ export function MemberPortalContentSettings({
                         <Input
                           id="category-order"
                           type="number"
-                          min="0"
-                          value={newFaqCategory.order}
-                          onChange={(e) => setNewFaqCategory({ 
-                            ...newFaqCategory, 
-                            order: parseInt(e.target.value) || 0 
-                          })}
+                          min={0}
+                          value={newFaqCategory.order || 0}
+                          onChange={(e) => setNewFaqCategory({ ...newFaqCategory, order: parseInt(e.target.value) })}
                         />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Categories are displayed in ascending order (0 appears first)
+                        </p>
                       </div>
                     </div>
                     <DialogFooter>
@@ -758,157 +848,178 @@ export function MemberPortalContentSettings({
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
+                
+                {/* FAQ Question Dialog */}
+                <Dialog open={faqQuestionDialogOpen} onOpenChange={setFaqQuestionDialogOpen}>
+                  <DialogContent className="sm:max-w-[600px]">
+                    <DialogHeader>
+                      <DialogTitle>{editingFaqQuestion ? "Edit Question" : "Add New Question"}</DialogTitle>
+                      <DialogDescription>
+                        {editingFaqQuestion ? "Update question details" : "Add a question to the selected category"}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="question-text">Question</Label>
+                        <Input
+                          id="question-text"
+                          value={newFaqQuestion.question || ""}
+                          onChange={(e) => setNewFaqQuestion({ ...newFaqQuestion, question: e.target.value })}
+                          placeholder="e.g., How do I cancel my membership?"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="question-answer">Answer</Label>
+                        <Textarea
+                          id="question-answer"
+                          value={newFaqQuestion.answer || ""}
+                          onChange={(e) => setNewFaqQuestion({ ...newFaqQuestion, answer: e.target.value })}
+                          placeholder="Detailed answer to the question..."
+                          rows={5}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="question-order">Display Order</Label>
+                        <Input
+                          id="question-order"
+                          type="number"
+                          min={0}
+                          value={newFaqQuestion.order || 0}
+                          onChange={(e) => setNewFaqQuestion({ ...newFaqQuestion, order: parseInt(e.target.value) })}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Questions are displayed in ascending order (0 appears first)
+                        </p>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="button" variant="outline" onClick={() => setFaqQuestionDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="button" onClick={handleFaqQuestionSubmit}>
+                        {editingFaqQuestion ? "Update" : "Add"} Question
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
-              
-              {/* Question Dialog */}
-              <Dialog open={faqQuestionDialogOpen} onOpenChange={setFaqQuestionDialogOpen}>
-                <DialogContent className="sm:max-w-[600px]">
-                  <DialogHeader>
-                    <DialogTitle>{editingFaqQuestion ? "Edit Question" : "Add New FAQ Question"}</DialogTitle>
-                    <DialogDescription>
-                      {editingFaqQuestion ? "Update question details" : "Add a new question and answer"}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="faq-question">Question</Label>
-                      <Input
-                        id="faq-question"
-                        value={newFaqQuestion.question}
-                        onChange={(e) => setNewFaqQuestion({ ...newFaqQuestion, question: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="faq-answer">Answer</Label>
-                      <Textarea
-                        id="faq-answer"
-                        value={newFaqQuestion.answer}
-                        onChange={(e) => setNewFaqQuestion({ ...newFaqQuestion, answer: e.target.value })}
-                        rows={5}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="question-order">Display Order</Label>
-                      <Input
-                        id="question-order"
-                        type="number"
-                        min="0"
-                        value={newFaqQuestion.order}
-                        onChange={(e) => setNewFaqQuestion({ 
-                          ...newFaqQuestion, 
-                          order: parseInt(e.target.value) || 0 
-                        })}
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setFaqQuestionDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="button" onClick={handleFaqQuestionSubmit}>
-                      {editingFaqQuestion ? "Update" : "Add"} Question
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
               
               {config.faqCategories.length === 0 ? (
                 <div className="text-center py-10 border rounded-md bg-muted/30">
                   <h3 className="text-lg font-medium mb-2">No FAQ Categories</h3>
-                  <p className="text-muted-foreground mb-4">Create categories to organize your frequently asked questions</p>
+                  <p className="text-muted-foreground mb-4">Create categories and add frequently asked questions</p>
                   <Button 
                     variant="outline" 
                     onClick={() => setFaqCategoryDialogOpen(true)}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Add FAQ Category
+                    Add Your First Category
                   </Button>
                 </div>
               ) : (
                 <div className="space-y-6">
                   {config.faqCategories.map((category) => (
-                    <div key={category.id} className="border rounded-md">
-                      <div className="flex justify-between items-center p-4 border-b">
-                        <div className="flex items-center gap-2">
-                          <Folder className="h-5 w-5 text-muted-foreground" />
-                          <h4 className="font-medium">{category.name}</h4>
-                          <Badge variant="outline" className="ml-2">
-                            {category.questions.length} {category.questions.length === 1 ? 'question' : 'questions'}
-                          </Badge>
+                    <Card key={category.id} className="overflow-hidden">
+                      <CardHeader className="bg-muted/30 py-3">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <FileQuestion className="h-4 w-4 text-muted-foreground" />
+                            <h4 className="font-medium">{category.name}</h4>
+                            <Badge variant="outline" className="ml-2">
+                              {category.questions.length} {category.questions.length === 1 ? 'question' : 'questions'}
+                            </Badge>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8"
+                              onClick={() => {
+                                setSelectedCategoryId(category.id);
+                                setEditingFaqQuestion(null);
+                                setNewFaqQuestion({
+                                  question: '',
+                                  answer: '',
+                                  order: 0
+                                });
+                                setFaqQuestionDialogOpen(true);
+                              }}
+                            >
+                              <Plus className="h-4 w-4 mr-1" />
+                              Add Question
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8"
+                              onClick={() => handleFaqCategoryEdit(category)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8"
+                              onClick={() => handleFaqCategoryDelete(category.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleAddFaqQuestion(category.id)}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => handleFaqCategoryEdit(category)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleFaqCategoryDelete(category.id)}
-                          >
-                            <Trash className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      {category.questions.length === 0 ? (
-                        <div className="p-6 text-center text-muted-foreground">
-                          <p>No questions in this category</p>
-                          <Button 
-                            variant="link" 
-                            onClick={() => handleAddFaqQuestion(category.id)}
-                          >
-                            Add a question
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="divide-y">
-                          {category.questions.map((question) => (
-                            <div key={question.id} className="p-4 hover:bg-muted/30">
-                              <div className="flex justify-between items-start">
-                                <div className="space-y-1 flex-1">
-                                  <div className="flex items-center gap-2">
-                                    <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                                    <h5 className="font-medium">{question.question}</h5>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        {category.questions.length === 0 ? (
+                          <div className="text-center py-6 border rounded-md bg-muted/20">
+                            <p className="text-muted-foreground mb-2">No questions in this category</p>
+                            <Button
+                              variant="link"
+                              onClick={() => {
+                                setSelectedCategoryId(category.id);
+                                setFaqQuestionDialogOpen(true);
+                              }}
+                            >
+                              <Plus className="h-4 w-4 mr-1" />
+                              Add First Question
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {category.questions
+                              .sort((a, b) => a.order - b.order)
+                              .map((question) => (
+                                <div key={question.id} className="border rounded-md p-3">
+                                  <div className="flex justify-between items-start">
+                                    <div>
+                                      <h5 className="font-medium">{question.question}</h5>
+                                      <p className="text-muted-foreground mt-1 text-sm">
+                                        {question.answer}
+                                      </p>
+                                    </div>
+                                    <div className="flex gap-1 ml-4">
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="h-7 w-7 p-0"
+                                        onClick={() => handleFaqQuestionEdit(category.id, question)}
+                                      >
+                                        <Edit className="h-4 w-4" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="h-7 w-7 p-0"
+                                        onClick={() => handleFaqQuestionDelete(category.id, question.id)}
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
                                   </div>
-                                  <p className="text-sm text-muted-foreground ml-6 mt-1">
-                                    {question.answer.length > 100 
-                                      ? `${question.answer.substring(0, 100)}...` 
-                                      : question.answer}
-                                  </p>
                                 </div>
-                                <div className="flex items-center gap-1 shrink-0 ml-4">
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    onClick={() => handleFaqQuestionEdit(category.id, question)}
-                                  >
-                                    <Edit className="h-4 w-4" />
-                                  </Button>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm"
-                                    onClick={() => handleFaqQuestionDelete(category.id, question.id)}
-                                  >
-                                    <Trash className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                              ))}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               )}

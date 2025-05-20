@@ -313,62 +313,11 @@ export interface MemberPortalConfig {
     };
   };
   
-  announcements: Array<{
-    id: string;
-    title: string;
-    content: string;
-    isSticky: boolean;
-    isPublished: boolean;
-    publishDate?: string;
-    expiryDate?: string;
-    createdAt: string;
-  }>;
-  
-  resources: Array<{
-    id: string;
-    name: string;
-    description?: string;
-    category: string;
-    fileUrl: string;
-    fileType: string;
-    isPublic: boolean;
-    createdAt: string;
-  }>;
-  
-  faqCategories: Array<{
-    id: string;
-    name: string;
-    order: number;
-    faqs: Array<{
-      id: string;
-      question: string;
-      answer: string;
-      order: number;
-    }>;
-  }>;
-  
-  emailTemplates: Array<{
-    id: string;
-    name: string;
-    subject: string;
-    body: string;
-    isEnabled: boolean;
-  }>;
-  
-  feedbackForms: Array<{
-    id: string;
-    name: string;
-    description?: string;
-    isEnabled: boolean;
-    fields: Array<{
-      id: string;
-      type: "text" | "textarea" | "select" | "radio" | "checkbox" | "rating";
-      label: string;
-      placeholder?: string;
-      isRequired: boolean;
-      options?: string[];
-    }>;
-  }>;
+  announcements: Array<MemberPortalAnnouncement>;
+  resources: Array<MemberPortalResource>;
+  faqCategories: Array<MemberPortalFaqCategory>;
+  emailTemplates: Array<MemberPortalEmailTemplate>;
+  feedbackForms: Array<MemberPortalFeedbackForm>;
 }
 
 export interface MemberPortalAnnouncement {
@@ -429,6 +378,7 @@ export interface MemberPortalFeedbackField {
   type: 'text' | 'textarea' | 'select' | 'radio' | 'checkbox' | 'rating';
   label: string;
   required: boolean;
+  placeholder?: string;
   options?: string[];
 }
 

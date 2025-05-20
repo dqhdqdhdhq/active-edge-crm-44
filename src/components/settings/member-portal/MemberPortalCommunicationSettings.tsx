@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -152,7 +151,8 @@ export function MemberPortalCommunicationSettings({
             name: newFeedbackForm.name || "", 
             description: newFeedbackForm.description || "",
             isEnabled: newFeedbackForm.isEnabled ?? true,
-            recipientEmails: newFeedbackForm.recipientEmails || []
+            recipientEmails: newFeedbackForm.recipientEmails || [],
+            fields: newFeedbackForm.fields || []
           } : f
         )
       }));
@@ -243,7 +243,7 @@ export function MemberPortalCommunicationSettings({
             ...f, 
             type: newField.type as MemberPortalFeedbackField['type'], 
             label: newField.label || "",
-            required: newField.required || false,
+            required: newField.required ?? false,
             options: newField.options || []
           } : f
         ) || []
@@ -254,7 +254,7 @@ export function MemberPortalCommunicationSettings({
         id: `field-${Date.now()}`,
         type: newField.type as MemberPortalFeedbackField['type'],
         label: newField.label || "",
-        required: newField.required || false,
+        required: newField.required ?? false,
         options: newField.options || []
       };
       
