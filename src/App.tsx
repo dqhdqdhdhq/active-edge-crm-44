@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MainLayout } from "./components/layout/MainLayout";
 import Dashboard from "./pages/Dashboard";
 import Members from "./pages/Members";
+import Guests from "./pages/Guests";
 import Classes from "./pages/Classes";
 import Trainers from "./pages/Trainers";
 import CheckIn from "./pages/CheckIn";
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="members" element={<Members />} />
+            <Route path="guests" element={<Guests />} />
             <Route path="classes" element={<Classes />} />
             <Route path="trainers" element={<Trainers />} />
             <Route path="check-in" element={<CheckIn />} />
@@ -40,4 +42,3 @@ const App = () => (
 );
 
 export default App;
-

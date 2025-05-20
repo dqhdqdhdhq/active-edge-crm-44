@@ -1,4 +1,3 @@
-
 export type MembershipType = 'Standard' | 'Premium' | 'VIP' | 'Student' | 'Senior' | 'Family' | 'Corporate';
 export type MembershipStatus = 'Active' | 'Inactive' | 'Expired' | 'Frozen' | 'Pending';
 export type MemberTag = 'VIP' | 'Personal Training' | 'New Member' | 'Special Needs' | 'Prospect' | 'Corporate';
@@ -25,6 +24,38 @@ export interface Member {
   };
   notes?: string;
   checkIns: CheckIn[];
+}
+
+export type GuestVisitPurpose = 'Trial' | 'Day Pass' | 'Tour' | 'Event' | 'Member Guest';
+export type GuestStatus = 'Checked In' | 'Checked Out' | 'Scheduled';
+
+export interface Guest {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  visitPurpose: GuestVisitPurpose;
+  relatedMemberId?: string;
+  waiverSigned: boolean;
+  checkInDateTime: string;
+  checkOutDateTime?: string;
+  status: GuestStatus;
+  notes?: string;
+  convertedToMember: boolean;
+  referralSource?: string;
+  visitHistory: GuestVisit[];
+  marketingConsent: boolean;
+}
+
+export interface GuestVisit {
+  id: string;
+  guestId: string;
+  checkInDateTime: string;
+  checkOutDateTime?: string;
+  visitPurpose: GuestVisitPurpose;
+  notes?: string;
+  staffId?: string;
 }
 
 export interface TrainerPerformance {
@@ -97,14 +128,4 @@ export interface DashboardStats {
   expiringMemberships: number;
   upcomingClasses: number;
   newMembers: number;
-}
-
-export interface Guest {
-  id: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  relatedMemberId?: string;
-  waiverSigned: boolean;
-  checkInDateTime: string;
 }

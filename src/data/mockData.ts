@@ -1,5 +1,4 @@
-
-import { Member, GymClass, Trainer, CheckIn, Note, DashboardStats } from '../lib/types';
+import { Member, GymClass, Trainer, CheckIn, Note, DashboardStats, Guest, GuestVisit } from '../lib/types';
 
 // Helper function to get a date in ISO format
 const getDateISO = (daysFromNow: number): string => {
@@ -354,6 +353,163 @@ export const notes: Note[] = [
   }
 ];
 
+// Mock guest data
+export const guests: Guest[] = [
+  {
+    id: '1',
+    firstName: 'David',
+    lastName: 'Wilson',
+    email: 'david.wilson@example.com',
+    phone: '(555) 234-5678',
+    visitPurpose: 'Trial',
+    waiverSigned: true,
+    checkInDateTime: getTimeToday(10, 15),
+    status: 'Checked In',
+    notes: 'Interested in personal training options. Considering a Premium membership.',
+    convertedToMember: false,
+    referralSource: 'Social Media',
+    visitHistory: [
+      {
+        id: '101',
+        guestId: '1',
+        checkInDateTime: getTimeToday(10, 15),
+        visitPurpose: 'Trial',
+        notes: 'First visit - complimentary trial pass',
+        staffId: '1'
+      }
+    ],
+    marketingConsent: true
+  },
+  {
+    id: '2',
+    firstName: 'Amanda',
+    lastName: 'Garcia',
+    email: 'amanda.g@example.com',
+    phone: '(555) 876-5432',
+    visitPurpose: 'Tour',
+    waiverSigned: true,
+    checkInDateTime: getTimeToday(14, 30),
+    checkOutDateTime: getTimeToday(15, 15),
+    status: 'Checked Out',
+    notes: 'Brought family to tour facility. Very interested in family membership.',
+    convertedToMember: false,
+    referralSource: 'Website',
+    visitHistory: [
+      {
+        id: '201',
+        guestId: '2',
+        checkInDateTime: getTimeToday(14, 30),
+        checkOutDateTime: getTimeToday(15, 15),
+        visitPurpose: 'Tour',
+        notes: 'Facility tour with family',
+        staffId: '2'
+      },
+      {
+        id: '202',
+        guestId: '2',
+        checkInDateTime: getDateISO(-7) + 'T13:00:00.000Z',
+        checkOutDateTime: getDateISO(-7) + 'T14:30:00.000Z',
+        visitPurpose: 'Trial',
+        notes: 'Initial workout session',
+        staffId: '3'
+      }
+    ],
+    marketingConsent: true
+  },
+  {
+    id: '3',
+    firstName: 'Thomas',
+    lastName: 'Lee',
+    email: 'thomas.l@example.com',
+    phone: '(555) 345-6789',
+    visitPurpose: 'Day Pass',
+    relatedMemberId: '1',
+    waiverSigned: true,
+    checkInDateTime: getDateISO(-1) + 'T16:45:00.000Z',
+    checkOutDateTime: getDateISO(-1) + 'T18:30:00.000Z',
+    status: 'Checked Out',
+    convertedToMember: false,
+    visitHistory: [
+      {
+        id: '301',
+        guestId: '3',
+        checkInDateTime: getDateISO(-1) + 'T16:45:00.000Z',
+        checkOutDateTime: getDateISO(-1) + 'T18:30:00.000Z',
+        visitPurpose: 'Day Pass',
+        staffId: '1'
+      }
+    ],
+    marketingConsent: false
+  },
+  {
+    id: '4',
+    firstName: 'Michelle',
+    lastName: 'Parker',
+    email: 'michelle.p@example.com',
+    phone: '(555) 987-1234',
+    visitPurpose: 'Event',
+    waiverSigned: true,
+    checkInDateTime: getDateISO(-3) + 'T09:00:00.000Z',
+    checkOutDateTime: getDateISO(-3) + 'T11:30:00.000Z',
+    status: 'Checked Out',
+    notes: 'Attended charity fitness event. Showed interest in VIP membership.',
+    convertedToMember: true,
+    referralSource: 'Friend Referral',
+    visitHistory: [
+      {
+        id: '401',
+        guestId: '4',
+        checkInDateTime: getDateISO(-3) + 'T09:00:00.000Z',
+        checkOutDateTime: getDateISO(-3) + 'T11:30:00.000Z',
+        visitPurpose: 'Event',
+        notes: 'Charity fitness event',
+        staffId: '2'
+      },
+      {
+        id: '402',
+        guestId: '4',
+        checkInDateTime: getDateISO(-10) + 'T15:00:00.000Z',
+        checkOutDateTime: getDateISO(-10) + 'T16:45:00.000Z',
+        visitPurpose: 'Tour',
+        notes: 'Initial facility tour',
+        staffId: '1'
+      }
+    ],
+    marketingConsent: true
+  },
+  {
+    id: '5',
+    firstName: 'Ryan',
+    lastName: 'Zhang',
+    email: 'ryan.z@example.com',
+    phone: '(555) 456-7890',
+    visitPurpose: 'Member Guest',
+    relatedMemberId: '3',
+    waiverSigned: true,
+    checkInDateTime: getTimeToday(17, 45),
+    status: 'Checked In',
+    convertedToMember: false,
+    visitHistory: [
+      {
+        id: '501',
+        guestId: '5',
+        checkInDateTime: getTimeToday(17, 45),
+        visitPurpose: 'Member Guest',
+        staffId: '3'
+      },
+      {
+        id: '502',
+        guestId: '5',
+        checkInDateTime: getDateISO(-14) + 'T18:00:00.000Z',
+        checkOutDateTime: getDateISO(-14) + 'T19:45:00.000Z',
+        visitPurpose: 'Member Guest',
+        staffId: '3'
+      }
+    ],
+    marketingConsent: true
+  }
+];
+
 // Dashboard stats
 export const dashboardStats: DashboardStats = {
   todayCheckIns: 27,
@@ -433,3 +589,47 @@ export const generateMembershipDistributionData = () => {
     { name: 'Senior', value: 25 }
   ];
 };
+
+// Mock guest visit data
+export const guestVisits: GuestVisit[] = [
+  {
+    id: '1',
+    guestId: '1',
+    checkInDateTime: getTimeToday(10, 15),
+    checkOutDateTime: getTimeToday(11, 00),
+    staffId: '1',
+    notes: 'Checked in for a complimentary trial pass'
+  },
+  {
+    id: '2',
+    guestId: '2',
+    checkInDateTime: getTimeToday(14, 30),
+    checkOutDateTime: getTimeToday(15, 15),
+    staffId: '2',
+    notes: 'Facility tour with family'
+  },
+  {
+    id: '3',
+    guestId: '3',
+    checkInDateTime: getDateISO(-1) + 'T16:45:00.000Z',
+    checkOutDateTime: getDateISO(-1) + 'T18:30:00.000Z',
+    staffId: '1',
+    notes: 'Day pass'
+  },
+  {
+    id: '4',
+    guestId: '4',
+    checkInDateTime: getDateISO(-3) + 'T09:00:00.000Z',
+    checkOutDateTime: getDateISO(-3) + 'T11:30:00.000Z',
+    staffId: '2',
+    notes: 'Charity fitness event'
+  },
+  {
+    id: '5',
+    guestId: '5',
+    checkInDateTime: getTimeToday(17, 45),
+    checkOutDateTime: getTimeToday(18, 00),
+    staffId: '3',
+    notes: 'Member guest'
+  }
+];
